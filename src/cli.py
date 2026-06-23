@@ -15,7 +15,7 @@ touching what's already in the pipeline.
 """
 import argparse
 import csv
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from . import db
@@ -84,7 +84,7 @@ def cmd_plan(args):
     direct_queue = [(lead, tier, score, "already_queued_today" if already else "new")
                      for lead, tier, score, already in direct_candidates]
 
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     for lead, tier, score, status in dm_queue + direct_queue:
         if status != "new":
             continue
@@ -157,7 +157,7 @@ def cmd_send(args):
     conn.execute("UPDATE actions_log SET status='sent' WHERE id=?", (args.action_id,))
     conn.execute(
         "UPDATE leads SET last_touch_date=?, num_touches=num_touches+1, updated_at=? WHERE lead_key=?",
-        (action["action_date"], datetime.utcnow().isoformat(), action["lead_key"]),
+        (action["action_date"], datetime.now(timezone.utc).isoformat(), action["lead_key"]),
     )
     conn.commit()
     print(f"[send] marked action {args.action_id} ({action['action_type']}) sent for {action['lead_key']}")

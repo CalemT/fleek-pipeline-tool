@@ -80,26 +80,44 @@ def _clean_row(row) -> dict:
     )
 
 
-def _find_existing_match(conn, c: dict):
-    """Look up an existing lead by email, phone_key, or handle. Phone is
-    matched on the last-9-digits key to tolerate +44/0044/0-prefix variants."""
-    if c["email"]:
-        row = conn.execute("SELECT * FROM leads WHERE email = ?", (c["email"],)).fetchone()
-        if row:
-            return row
-    if c["phone_key"]:
-        row = conn.execute(
-            "SELECT * FROM leads WHERE phone IS NOT NULL AND "
-            "substr(replace(replace(replace(phone,'+',''),' ',''),'-',''), -9) = ?",
-            (c["phone_key"],),
-        ).fetchone()
-        if row:
-            return row
-    if c["handle"]:
-        row = conn.execute("SELECT * FROM leads WHERE handle = ?", (c["handle"],)).fetchone()
-        if row:
-            return row
-    return None
+class MatchIndex:
+    """In-memory email/phone-key/handle -> lead_key lookup, built once per
+    ingest run and updated as we go. This is what keeps ingest O(n) instead
+    of O(n^2): without it, matching each new row would mean scanning the
+    (growing) leads table on every row, which is fine at 265 rows and falls
+    over hard at 30,000+.
+    """
+
+    def __init__(self, conn):
+        self.by_email, self.by_phone_key, self.by_handle = {}, {}, {}
+        for row in conn.execute(
+            "SELECT lead_key, email, phone, handle FROM leads"
+        ).fetchall():
+            if row["email"]:
+                self.by_email[row["email"]] = row["lead_key"]
+            if row["phone"]:
+                digits = "".join(ch for ch in row["phone"] if ch.isdigit())
+                if digits:
+                    self.by_phone_key[digits[-9:]] = row["lead_key"]
+            if row["handle"]:
+                self.by_handle[row["handle"]] = row["lead_key"]
+
+    def find(self, c: dict):
+        if c["email"] and c["email"] in self.by_email:
+            return self.by_email[c["email"]]
+        if c["phone_key"] and c["phone_key"] in self.by_phone_key:
+            return self.by_phone_key[c["phone_key"]]
+        if c["handle"] and c["handle"] in self.by_handle:
+            return self.by_handle[c["handle"]]
+        return None
+
+    def register(self, lead_key: str, c: dict):
+        if c["email"]:
+            self.by_email[c["email"]] = lead_key
+        if c["phone_key"]:
+            self.by_phone_key[c["phone_key"]] = lead_key
+        if c["handle"]:
+            self.by_handle[c["handle"]] = lead_key
 
 
 def _merge_fields(existing, new: dict) -> dict:
@@ -148,83 +166,102 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
     now = _now()
     stats = {"rows_seen": len(df), "new_leads": 0, "merged_into_existing": 0}
 
+    raw_intake_rows = [
+        (batch_label, now, str(r["lead_id"]), json.dumps(r.to_dict(), default=str))
+        for _, r in df.iterrows()
+    ]
+    conn.executemany(
+        "INSERT INTO raw_intake (batch_label, ingested_at, raw_lead_id, raw_json) VALUES (?,?,?,?)",
+        raw_intake_rows,
+    )
+
+    index = MatchIndex(conn)
+    # Cache full existing lead rows we touch so repeat matches within the
+    # same batch (a row matching another row from this same file) merge
+    # against the latest in-memory state, not a stale DB read.
+    leads_cache = {}
+
     for _, raw_row in df.iterrows():
-        conn.execute(
-            "INSERT INTO raw_intake (batch_label, ingested_at, raw_lead_id, raw_json) VALUES (?,?,?,?)",
-            (batch_label, now, str(raw_row["lead_id"]), json.dumps(raw_row.to_dict(), default=str)),
-        )
         c = _clean_row(raw_row)
-        existing = _find_existing_match(conn, c)
+        match_key = index.find(c)
+        existing = leads_cache.get(match_key) if match_key else None
+        if match_key and existing is None:
+            row = conn.execute("SELECT * FROM leads WHERE lead_key=?", (match_key,)).fetchone()
+            existing = dict(row)
+            leads_cache[match_key] = existing
 
         if existing:
             merged = _merge_fields(existing, c)
             merged["channel"] = classify_channel(merged["email"], merged["phone"], merged["handle"])
             merged["updated_at"] = now
-            conn.execute(
-                """UPDATE leads SET source_lead_ids=:source_lead_ids, channel=:channel,
-                   handle=:handle, store_name=:store_name, contact_name=:contact_name,
-                   email=:email, phone=:phone, city=:city, country=:country,
-                   followers=:followers, active_listings=:active_listings,
-                   avg_listing_price_gbp=:avg_listing_price_gbp,
-                   sales_velocity_30d=:sales_velocity_30d,
-                   est_monthly_spend_gbp=:est_monthly_spend_gbp, stage=:stage,
-                   first_seen_date=:first_seen_date, last_touch_date=:last_touch_date,
-                   num_touches=:num_touches, last_inbound_text=:last_inbound_text,
-                   assigned_bdr=:assigned_bdr, notes=:notes,
-                   data_quality_flags=:data_quality_flags, updated_at=:updated_at
-                   WHERE lead_key=:lead_key""",
-                {**merged, "lead_key": existing["lead_key"]},
-            )
+            leads_cache[existing["lead_key"]] = merged
+            index.register(existing["lead_key"], c)
             stats["merged_into_existing"] += 1
         else:
             lead_key = f"lead:{c['lead_id']}"
             channel = classify_channel(c["email"], c["phone"], c["handle"])
-            conn.execute(
-                """INSERT INTO leads (
-                    lead_key, source_lead_ids, channel, source_label, store_name,
-                    contact_name, handle, email, phone, city, country, followers,
-                    active_listings, avg_listing_price_gbp, sales_velocity_30d,
-                    est_monthly_spend_gbp, stage, first_seen_date, last_touch_date,
-                    num_touches, last_inbound_text, assigned_bdr, notes,
-                    data_quality_flags, created_at, updated_at
-                ) VALUES (
-                    :lead_key, :source_lead_ids, :channel, :source_label, :store_name,
-                    :contact_name, :handle, :email, :phone, :city, :country, :followers,
-                    :active_listings, :avg_listing_price_gbp, :sales_velocity_30d,
-                    :est_monthly_spend_gbp, :stage, :first_seen_date, :last_touch_date,
-                    :num_touches, :last_inbound_text, :assigned_bdr, :notes,
-                    :data_quality_flags, :created_at, :updated_at
-                )""",
-                {
-                    "lead_key": lead_key,
-                    "source_lead_ids": c["lead_id"],
-                    "channel": channel,
-                    "source_label": c["source_label"],
-                    "store_name": c["store_name"],
-                    "contact_name": c["contact_name"],
-                    "handle": c["handle"],
-                    "email": c["email"],
-                    "phone": c["phone"],
-                    "city": c["city"],
-                    "country": c["country"],
-                    "followers": c["followers"],
-                    "active_listings": c["active_listings"],
-                    "avg_listing_price_gbp": c["avg_listing_price_gbp"],
-                    "sales_velocity_30d": c["sales_velocity_30d"],
-                    "est_monthly_spend_gbp": c["est_monthly_spend_gbp"],
-                    "stage": c["stage"],
-                    "first_seen_date": c["first_seen_date"],
-                    "last_touch_date": c["last_touch_date"],
-                    "num_touches": c["num_touches"],
-                    "last_inbound_text": c["last_inbound_text"],
-                    "assigned_bdr": c["assigned_bdr"],
-                    "notes": c["notes"],
-                    "data_quality_flags": clean.flags_to_json(c["flags"]),
-                    "created_at": now,
-                    "updated_at": now,
-                },
-            )
+            new_lead = {
+                "lead_key": lead_key,
+                "source_lead_ids": c["lead_id"],
+                "channel": channel,
+                "source_label": c["source_label"],
+                "store_name": c["store_name"],
+                "contact_name": c["contact_name"],
+                "handle": c["handle"],
+                "email": c["email"],
+                "phone": c["phone"],
+                "city": c["city"],
+                "country": c["country"],
+                "followers": c["followers"],
+                "active_listings": c["active_listings"],
+                "avg_listing_price_gbp": c["avg_listing_price_gbp"],
+                "sales_velocity_30d": c["sales_velocity_30d"],
+                "est_monthly_spend_gbp": c["est_monthly_spend_gbp"],
+                "stage": c["stage"],
+                "first_seen_date": c["first_seen_date"],
+                "last_touch_date": c["last_touch_date"],
+                "num_touches": c["num_touches"],
+                "last_inbound_text": c["last_inbound_text"],
+                "assigned_bdr": c["assigned_bdr"],
+                "notes": c["notes"],
+                "data_quality_flags": clean.flags_to_json(c["flags"]),
+                "created_at": now,
+                "updated_at": now,
+            }
+            leads_cache[lead_key] = new_lead
+            index.register(lead_key, c)
             stats["new_leads"] += 1
 
+    upsert_sql = """
+        INSERT INTO leads (
+            lead_key, source_lead_ids, channel, source_label, store_name,
+            contact_name, handle, email, phone, city, country, followers,
+            active_listings, avg_listing_price_gbp, sales_velocity_30d,
+            est_monthly_spend_gbp, stage, first_seen_date, last_touch_date,
+            num_touches, last_inbound_text, assigned_bdr, notes,
+            data_quality_flags, created_at, updated_at
+        ) VALUES (
+            :lead_key, :source_lead_ids, :channel, :source_label, :store_name,
+            :contact_name, :handle, :email, :phone, :city, :country, :followers,
+            :active_listings, :avg_listing_price_gbp, :sales_velocity_30d,
+            :est_monthly_spend_gbp, :stage, :first_seen_date, :last_touch_date,
+            :num_touches, :last_inbound_text, :assigned_bdr, :notes,
+            :data_quality_flags, :created_at, :updated_at
+        )
+        ON CONFLICT(lead_key) DO UPDATE SET
+            source_lead_ids=excluded.source_lead_ids, channel=excluded.channel,
+            handle=excluded.handle, store_name=excluded.store_name,
+            contact_name=excluded.contact_name, email=excluded.email,
+            phone=excluded.phone, city=excluded.city, country=excluded.country,
+            followers=excluded.followers, active_listings=excluded.active_listings,
+            avg_listing_price_gbp=excluded.avg_listing_price_gbp,
+            sales_velocity_30d=excluded.sales_velocity_30d,
+            est_monthly_spend_gbp=excluded.est_monthly_spend_gbp, stage=excluded.stage,
+            first_seen_date=excluded.first_seen_date, last_touch_date=excluded.last_touch_date,
+            num_touches=excluded.num_touches, last_inbound_text=excluded.last_inbound_text,
+            assigned_bdr=excluded.assigned_bdr, notes=excluded.notes,
+            data_quality_flags=excluded.data_quality_flags, updated_at=excluded.updated_at
+    """
+    conn.executemany(upsert_sql, list(leads_cache.values()))
     conn.commit()
     return stats
