@@ -19,6 +19,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from . import db
+from . import config as cfg
 from . import ingest as ingest_mod
 from . import scoring
 from . import drafting
@@ -340,7 +341,7 @@ def cmd_recalibrate(args):
     # Rule of thumb from applied statistics (events-per-variable, EPV): you
     # want roughly 10+ outcome events per input feature in the SMALLER
     # outcome class, or coefficients become unstable / overfit to noise.
-    epv_target = 10
+    epv_target = cfg.load_config()["recalibration"]["epv_target"]
     required = epv_target * len(feature_names)
 
     print(f"[recalibrate] resolved leads: {n_won} won, {n_lost} lost "
@@ -434,6 +435,48 @@ def cmd_auto_ingest(args):
     conn.close()
 
 
+def cmd_rebalance_caps(args):
+    """The actual point of `config/assumptions.yaml`'s channel_performance
+    section: once Fleek has real reply/conversion data per channel, this
+    recommends how to redistribute the email/call/visit caps toward
+    whichever channel is actually converting best - rather than treating
+    all capacity as equally valuable, which is what the tool assumes by
+    default. Instagram is excluded from rebalancing since its cap is a
+    platform limit, not a choice. Same posture as `recalibrate`: checks
+    honestly whether there's real data before recommending anything, and
+    never auto-applies a change."""
+    perf = cfg.load_config()["channel_performance"]
+    rebalanceable = {"email": perf["email"]["conversion_rate"],
+                      "call": perf["call"]["conversion_rate"],
+                      "visit": perf["visit"]["conversion_rate"]}
+    filled_in = {k: v for k, v in rebalanceable.items() if v is not None}
+
+    if len(filled_in) < 2:
+        missing = [k for k in rebalanceable if rebalanceable[k] is None]
+        print("[rebalance-caps] Not enough real channel performance data yet.")
+        print(f"[rebalance-caps] Need conversion_rate for at least 2 of "
+              f"email/call/visit to compare - currently have {len(filled_in)}.")
+        print(f"[rebalance-caps] Fill in channel_performance.<channel>.conversion_rate "
+              f"for: {', '.join(missing)} in config/assumptions.yaml, then re-run.")
+        print("[rebalance-caps] Keeping the current daily_caps as-is.")
+        return
+
+    best = max(filled_in, key=filled_in.get)
+    print(f"[rebalance-caps] Real conversion rates on file: "
+          + ", ".join(f"{k}={v:.1%}" for k, v in filled_in.items()))
+    print(f"[rebalance-caps] '{best}' is converting best of the channels with data.")
+    caps = cfg.load_config()["daily_caps"]
+    for channel, rate in filled_in.items():
+        if channel == best:
+            continue
+        ratio = rate / filled_in[best] if filled_in[best] else 0
+        print(f"[rebalance-caps]   '{channel}' converts at {ratio:.0%} of '{best}''s rate "
+              f"(current cap: {caps.get(channel)}/day) - consider shifting capacity toward "
+              f"'{best}' where the underlying constraint (team size, travel time) allows it.")
+    print("[rebalance-caps] This is a recommendation only - edit daily_caps in "
+          "config/assumptions.yaml by hand if you agree with it.")
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -451,19 +494,22 @@ def main():
 
     p_plan = sub.add_parser("plan", help="Build today's outreach queue (idempotent per day)")
     p_plan.add_argument("--date", default=None, help="YYYY-MM-DD, defaults to today")
-    p_plan.add_argument("--dm-cap", type=int, default=40)
-    p_plan.add_argument("--email-cap", type=int, default=150,
+    _caps = cfg.load_config()["daily_caps"]
+    p_plan.add_argument("--dm-cap", type=int, default=_caps["instagram_dm"])
+    p_plan.add_argument("--email-cap", type=int, default=_caps["email"],
                          help="Max store emails/day. Email is the one channel that genuinely "
                               "scales with automation (API into Gmail/an ESP, AI-drafted, sent "
                               "in bulk) - this number is a conservative placeholder pending real "
-                              "sender deliverability limits, not a team-headcount constraint.")
-    p_plan.add_argument("--call-cap", type=int, default=30,
+                              "sender deliverability limits, not a team-headcount constraint. "
+                              "Default comes from config/assumptions.yaml.")
+    p_plan.add_argument("--call-cap", type=int, default=_caps["call"],
                          help="Max store calls/day - a real human-capacity assumption "
                               "(~30-40 dials/day is a typical single-BDR benchmark), not a "
-                              "platform rule. Multiply by number of reps actually making calls.")
-    p_plan.add_argument("--visit-cap", type=int, default=5,
+                              "platform rule. Default comes from config/assumptions.yaml.")
+    p_plan.add_argument("--visit-cap", type=int, default=_caps["visit"],
                          help="Max store visits/day - the most genuinely constrained action "
-                              "(travel time, not just willingness). Pairs with city grouping.")
+                              "(travel time, not just willingness). Default comes from "
+                              "config/assumptions.yaml.")
     p_plan.set_defaults(func=cmd_plan)
 
     p_send = sub.add_parser("send", help="Mark a queued action as sent")
@@ -481,6 +527,9 @@ def main():
 
     p_recal = sub.add_parser("recalibrate", help="Fit real weights from outcome data, if there's enough of it")
     p_recal.set_defaults(func=cmd_recalibrate)
+
+    p_rebal = sub.add_parser("rebalance-caps", help="Recommend cap changes from real channel performance data")
+    p_rebal.set_defaults(func=cmd_rebalance_caps)
 
     args = p.parse_args()
     args.func(args)

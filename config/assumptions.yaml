@@ -1,0 +1,45 @@
+# Fleek-specific operating assumptions used by the pipeline tool.
+#
+# Every number in `daily_caps` below is a REASONED PLACEHOLDER, not something
+# Fleek told us - see ARCHITECTURE.md for the reasoning behind each one.
+# Once Fleek has real numbers (actual BDR headcount and dial rates, actual
+# email sending limits from whatever ESP/Gmail setup is in use, actual visit
+# capacity per week), replace the values here. Nothing else in the code
+# needs to change - src/cli.py reads its defaults from this file.
+
+daily_caps:
+  instagram_dm: 40   # NOT a placeholder - this one is a real Instagram platform limit
+  email: 150         # placeholder - real ceiling is sender deliverability, not headcount
+  call: 30            # placeholder - typical single-BDR dialing benchmark; multiply by
+                       # however many people actually make outbound calls
+  visit: 5             # placeholder - travel-time constrained, pairs with city grouping
+
+# --- Insert Fleek data here -------------------------------------------------
+# Everything below is `null` because we don't have it. Once Fleek has actual
+# channel performance numbers (from a CRM, dialer, or email tool - however
+# many weeks/months of data exists), fill in whichever fields you have and
+# run `python -m src.cli rebalance-caps`. It will tell you honestly whether
+# there's enough filled in to make a real recommendation, and if so, suggest
+# how to redistribute the email/call/visit caps above toward whichever
+# channel is actually converting best - rather than treating all leftover
+# capacity above as equally valuable, which is what the tool assumes today
+# in the absence of any real performance data.
+channel_performance:
+  instagram_dm:
+    reply_rate: null        # e.g. 0.12 = 12% of DMs get any reply
+    conversion_rate: null   # e.g. 0.03 = 3% of DMs become a paying customer
+  email:
+    reply_rate: null
+    conversion_rate: null
+  call:
+    connect_rate: null      # % of dials that reach an actual person
+    conversion_rate: null
+  visit:
+    conversion_rate: null
+
+# How many real won/lost outcomes are needed per scoring feature before
+# `recalibrate` will fit real weights instead of leaving the reasoned
+# starting weights in scoring.py alone. See ARCHITECTURE.md for why 10 is
+# the standard statistics rule-of-thumb default here (events-per-variable).
+recalibration:
+  epv_target: 10

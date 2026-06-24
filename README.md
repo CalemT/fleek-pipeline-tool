@@ -75,6 +75,30 @@ desktop app is open (it catches up on wake if you miss a run), so it's a
 good complement to the GitHub Actions workflow for visibility, not a
 replacement for the part that needs to run with zero dependencies.
 
+## Plugging in Fleek's real numbers
+
+Every capacity number and conversion rate in this tool is currently a
+reasoned placeholder, not something Fleek told us. They all live in one
+file - `config/assumptions.yaml` - specifically so that swapping in real
+data later is a config edit, not a code change:
+
+- `daily_caps` - the email/call/visit caps (Instagram's 40 is the one real
+  platform number; the rest are starting assumptions about team capacity).
+- `channel_performance` - currently all `null`. The moment Fleek has even a
+  few weeks of real reply/connect/conversion data per channel (from a CRM,
+  dialer, or email tool), fill in `conversion_rate` for at least two
+  channels and run:
+
+  ```bash
+  python -m src.cli rebalance-caps
+  ```
+
+  It checks honestly whether there's enough filled in to say anything
+  useful, and if so, recommends which channel to shift capacity toward
+  based on which is actually converting - rather than the tool's default
+  assumption that all capacity is equally valuable. Like `recalibrate`, it
+  only ever recommends; it never edits the config file for you.
+
 Re-running `plan` on the *same* date is a no-op for anyone already queued
 that day - the CSV comes back identical, nothing gets double-drafted or
 double-sent. Re-running `ingest` with a new file merges new leads in and

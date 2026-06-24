@@ -145,6 +145,16 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
   in the meantime: average score of leads that have actually won vs lost
   *through the tool's own loop*. Correctly reports no data yet on a fresh
   handover, since already-resolved leads predate the tool.
+- *The same logic applies to capacity, not just lead scoring.* The
+  email/call/visit caps assume all three are equally worth filling once
+  Instagram's real platform cap is met. `config/assumptions.yaml` has a
+  `channel_performance` section (currently all `null`) for real
+  reply/connect/conversion rates per channel; `python -m src.cli
+  rebalance-caps` checks whether enough of it is filled in to recommend
+  shifting capacity toward whichever channel is actually converting best,
+  and refuses to guess otherwise (verified both paths: with no data, and
+  with a simulated dataset where visit demonstrably outperformed email/call
+  - it correctly recommended shifting toward visit).
 
 **Known limitation, not worth building yet:**
 - *One Instagram sending account means the 40/day cap doesn't scale to
