@@ -100,11 +100,24 @@ paced and somewhat manual anyway.
 Three different kinds of "not perfect yet," sorted by what they actually need:
 
 **Fixed in this build:**
-- *Phone-matching collisions get more likely at scale, not less* (matching
-  on last-9-digits to tolerate `+44`/`0044`/leading-zero formats). Fixed by
-  flagging any merge where phone is the *only* matching field with no
-  corroborating email or handle as `low_confidence_phone_merge`, rather than
-  silently trusting it. `python -m src.cli review-queue` exports these.
+- *Phone matching was originally a digits-stripping heuristic (last-9-digits,
+  to tolerate `+44`/`0044`/leading-zero formats), which works for formatting
+  variance but couldn't actually rule out two different real numbers from
+  different countries coincidentally sharing those digits as scale grows.*
+  Replaced entirely with real E.164 parsing via the `phonenumbers` library
+  (Google's libphonenumber) - the same number written three ways now
+  normalizes to one identical string, so matching is exact, not fuzzy, and
+  the cross-country collision risk is closed rather than just flagged.
+  Found two real things while building this, not just in theory: (1)
+  `is_valid_number()` is the wrong check for CRM/synthetic data - it
+  verifies real-world *assigned* number ranges, not structural plausibility,
+  and was flagging roughly half of all real phones in this dataset as
+  malformed; switched to `is_possible_number()`. (2) Every French (+33)
+  phone number in the actual dataset has 10 digits where a real French
+  number has 9 - a genuine quirk in how the case study data was generated,
+  now correctly surfaced via `python -m src.cli review-queue` instead of
+  silently accepted by the old heuristic, which never validated structure
+  at all.
 - *The brief pictures this running every morning, agent-run - but there was
   no actual scheduling artifact, just a description of one.* Fixed with
   `run_daily.sh` (picks up any new file in `data/incoming/` via the new
