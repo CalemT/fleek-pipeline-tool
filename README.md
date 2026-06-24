@@ -43,6 +43,11 @@ python -m src.cli review-queue
 # 7. Sanity-check the scoring rubric against real outcomes, once leads have
 #    actually resolved won/lost through the tool's own loop
 python -m src.cli calibration
+
+# 8. Check whether there's enough real outcome data to fit actual scoring
+#    weights instead of the reasoned starting weights (gated on a standard
+#    statistics threshold - won't do anything until there genuinely is enough)
+python -m src.cli recalibrate
 ```
 
 Re-running `plan` on the *same* date is a no-op for anyone already queued

@@ -252,6 +252,86 @@ def cmd_calibration(args):
     conn.close()
 
 
+def cmd_recalibrate(args):
+    """Check whether there's enough real outcome data to responsibly fit
+    actual weights (instead of the reasoned-but-unproven starting weights in
+    scoring.py), and if so, fit them and write a recommendation file - never
+    silently overwrite the live weights. This is the 'instrumented now,
+    self-corrects once there's enough data' piece: it's honest about not
+    running until there's a statistically defensible amount of data."""
+    import json as _json
+    from datetime import date as _date
+
+    from . import scoring as sc
+
+    conn = db.connect(args.db)
+    rows = conn.execute("SELECT * FROM leads WHERE stage IN ('won','lost')").fetchall()
+
+    feature_names = ["spend", "velocity", "listings", "followers", "touches", "replied", "recency"]
+    today = _date.today()
+
+    def featurize(r):
+        days = sc._days_since(r["last_touch_date"], today)
+        recency = max(0.0, 1.0 - (days / sc.RECENCY_HORIZON_DAYS)) if days is not None else 0.0
+        return [
+            sc._norm(r["est_monthly_spend_gbp"], sc.MAX_SPEND_CAP) or 0.0,
+            sc._norm(r["sales_velocity_30d"], sc.MAX_VELOCITY_CAP) or 0.0,
+            sc._norm(r["active_listings"], sc.MAX_LISTINGS_CAP) or 0.0,
+            sc._norm(r["followers"], sc.MAX_FOLLOWERS_CAP) or 0.0,
+            sc._norm(r["num_touches"], sc.MAX_TOUCHES_CAP) or 0.0,
+            1.0 if r["last_inbound_text"] else 0.0,
+            recency,
+        ]
+
+    X = [featurize(r) for r in rows]
+    y = [1 if r["stage"] == "won" else 0 for r in rows]
+    n_won, n_lost = sum(y), len(y) - sum(y)
+    n_minority = min(n_won, n_lost) if y else 0
+
+    # Rule of thumb from applied statistics (events-per-variable, EPV): you
+    # want roughly 10+ outcome events per input feature in the SMALLER
+    # outcome class, or coefficients become unstable / overfit to noise.
+    epv_target = 10
+    required = epv_target * len(feature_names)
+
+    print(f"[recalibrate] resolved leads: {n_won} won, {n_lost} lost "
+          f"(smaller class = {n_minority})")
+    print(f"[recalibrate] need ~{required} ({epv_target} x {len(feature_names)} features) "
+          f"in the smaller class to fit responsibly")
+
+    if n_minority < required:
+        print(f"[recalibrate] NOT ENOUGH DATA YET ({n_minority}/{required}). "
+              f"Keeping the reasoned starting weights in scoring.py as-is. "
+              f"This is expected this early - re-run after more leads have "
+              f"resolved won/lost through real usage.")
+        conn.close()
+        return
+
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import cross_val_score
+
+    model = LogisticRegression(class_weight="balanced", max_iter=1000)
+    cv_scores = cross_val_score(model, X, y, cv=5, scoring="roc_auc")
+    model.fit(X, y)
+
+    recommendation = {
+        "n_won": n_won, "n_lost": n_lost,
+        "cross_val_auc_mean": round(float(cv_scores.mean()), 3),
+        "coefficients": {name: round(float(c), 3) for name, c in zip(feature_names, model.coef_[0])},
+        "intercept": round(float(model.intercept_[0]), 3),
+        "note": "Positive coefficient = higher values of this feature correlate with "
+                "winning. Review against scoring.py's FIT_WEIGHTS / ENGAGEMENT_WEIGHTS "
+                "and update by hand if these are stable across multiple runs - this "
+                "file is a recommendation, not an automatic change.",
+    }
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    path = OUTPUT_DIR / "recalibration_recommendation.json"
+    path.write_text(_json.dumps(recommendation, indent=2))
+    print(f"[recalibrate] fitted on {len(y)} resolved leads, mean CV ROC-AUC={cv_scores.mean():.3f}")
+    print(f"[recalibrate] -> {path} (review before changing scoring.py)")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -280,6 +360,9 @@ def main():
 
     p_calib = sub.add_parser("calibration", help="Check whether the scoring rubric matches real outcomes")
     p_calib.set_defaults(func=cmd_calibration)
+
+    p_recal = sub.add_parser("recalibrate", help="Fit real weights from outcome data, if there's enough of it")
+    p_recal.set_defaults(func=cmd_recalibrate)
 
     args = p.parse_args()
     args.func(args)

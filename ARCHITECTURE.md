@@ -96,15 +96,28 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
   an implicit "someone will notice."
 
 **Instrumented now, self-corrects once there's enough data:**
-- *The scoring rubric (tier + value) is a judgment call, not something
-  trained on outcomes* - there are only 9 won / 14 lost leads in the
-  handover, nowhere near enough to validate it. Every action already logs
-  the score the lead had at the time (`actions_log.score`), so the moment
-  enough leads resolve to won/lost *through the tool's own loop*, run
-  `python -m src.cli calibration` to check whether higher-scored leads
-  actually convert more - and revisit the weights in `scoring.py` if not.
-  (On a freshly-ingested handover this correctly reports no data yet -
-  the already-resolved leads got there before the tool existed.)
+- *The scoring rubric started as a judgment call, not something trained on
+  outcomes.* It's now built on the standard B2B lead-scoring structure
+  (Fit + Engagement + funnel stage, the same three buckets most real lead
+  scoring models use - see below), with weights chosen by reasoning, not
+  guessed blind. But "reasoned" still isn't "proven." Every action already
+  logs the score the lead had at the time (`actions_log.score`), and
+  `python -m src.cli recalibrate` checks, every time it's run, whether
+  there's enough real won/lost outcome data to responsibly fit actual
+  weights with logistic regression - using the standard events-per-variable
+  rule of thumb (~10 outcomes per feature in the smaller class). Today
+  that's 9 won leads against a ~70-needed threshold for 7 features, so it
+  correctly refuses to fit anything and says so explicitly. It never
+  silently rewrites `scoring.py` even once there's enough data - it writes
+  a recommendation file for a human to review. (Verified this actually
+  works, not just looks plausible: ran it against a synthetic batch where
+  spend and "having replied" were deliberately made to predict winning, and
+  it correctly recovered strong positive coefficients on exactly those two
+  features - see git history for the test run.)
+- *Run `python -m src.cli calibration`* for a lighter, no-dependency check
+  in the meantime: average score of leads that have actually won vs lost
+  *through the tool's own loop*. Correctly reports no data yet on a fresh
+  handover, since already-resolved leads predate the tool.
 
 **Known limitation, not worth building yet:**
 - *One Instagram sending account means the 40/day cap doesn't scale to
@@ -120,6 +133,16 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
 
 ## Why these specific design choices
 
+- **The scoring structure follows how real B2B lead scoring is built, not
+  an invented rubric.** Most production lead-scoring models split into
+  Fit (does this account look like a real, sizable business - here:
+  spend, sales velocity, listings, followers), Engagement (are they
+  actually interacting with us - here: replies, touch count, recency), and
+  funnel stage/status, which independent research found to be one of the
+  *strongest* individual predictors of conversion on its own. That's why
+  stage is the primary gate (the tier system) here, with Fit+Engagement
+  only breaking ties within a tier - it mirrors that finding rather than
+  treating spend and stage as equally-weighted inputs into one number.
 - **Tier beats value, always.** The case study's own framing - "a lot of
   these leads are sitting half-replied with nobody following up" - is the
   signal that engagement state matters more than account size. A lead who
