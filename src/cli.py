@@ -130,6 +130,7 @@ def _write_csv(path, queue, conn, today_iso, group_by_city=False):
             "phone": lead["phone"],
             "city": lead["city"] or "",
             "stage": lead["stage"],
+            "segment": lead["segment"],
             "tier": tier,
             "score": round(score, 1),
             "action_type": action_row["action_type"] if action_row else "",
@@ -168,6 +169,7 @@ def cmd_status(args):
     conn = db.connect(args.db)
     total = conn.execute("SELECT COUNT(*) c FROM leads").fetchone()["c"]
     by_channel = conn.execute("SELECT channel, COUNT(*) c FROM leads GROUP BY channel").fetchall()
+    by_segment = conn.execute("SELECT segment, COUNT(*) c FROM leads GROUP BY segment ORDER BY c DESC").fetchall()
     by_stage = conn.execute("SELECT stage, COUNT(*) c FROM leads GROUP BY stage ORDER BY c DESC").fetchall()
     flagged = conn.execute(
         "SELECT COUNT(*) c FROM leads WHERE data_quality_flags != '[]'"
@@ -176,6 +178,9 @@ def cmd_status(args):
     print("By channel:")
     for r in by_channel:
         print(f"  {r['channel']:14s} {r['c']}")
+    print("By segment:")
+    for r in by_segment:
+        print(f"  {r['segment']:18s} {r['c']}")
     print("By stage:")
     for r in by_stage:
         print(f"  {r['stage']:14s} {r['c']}")

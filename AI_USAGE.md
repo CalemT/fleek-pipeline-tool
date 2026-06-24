@@ -33,6 +33,29 @@ access to inspect the data and write/run/fix code.
   kind of thing that's easy to miss without actually generating a large
   synthetic batch and timing it, which is why `tests/scale_test.py` exists
   as a real check rather than just a comment claiming it scales.
+- **Researching Fleek's actual business, not just generic B2B lead-scoring
+  theory.** The first pass at the scoring rubric was built on generic B2B
+  SaaS lead-scoring research (content downloads, job titles, company size -
+  the most common results for that search). That's a weak foundation for a
+  company whose customers aren't a software buying committee. Fetching
+  joinfleek.com directly surfaced something much more useful: Fleek
+  explicitly markets to three named customer segments (New Reseller,
+  Full-Time Reseller, Business/shops), each with a different pitch. That's
+  now reflected in `classify.py` (`classify_segment`) and in the drafted
+  messages themselves (`drafting.py`'s `SEGMENT_HOOK`), instead of one
+  generic template for every reseller.
+- **Catching a real factual error by going to the source.** Re-reading the
+  case study brief alongside the actual website surfaced that several of
+  the first-draft message templates had the transaction backwards - they
+  read as "we want to buy your stock," when the brief is explicit
+  ("we sell to two very different kinds of lead") and the website confirms
+  it: Fleek supplies wholesale vintage *to* resellers/shops, who resell it
+  individually. This is the kind of mistake that's easy to make by pattern-
+  matching the word "buying" in the brief's own example sentence ("you are
+  buying 100 t-shirts... instead of one") without checking which party is
+  doing the buying in *this* pipeline - and exactly why checking generated
+  output against the primary source (the company's own site, not just the
+  brief) matters before treating AI output as correct.
 - **Writing tests and the architecture diagram/doc.**
 
 ## Where it sped things up

@@ -90,6 +90,15 @@ safe to run unattended every morning rather than by hand.
 - **Entity resolution is by contact fields, not `lead_id`.** The handover
   data proves `lead_id` isn't a reliable key (duplicate people show up under
   different IDs); email/phone/handle are.
+- **Channel and segment are two different questions, and the code keeps
+  them separate.** `channel` is "how do we contact this lead" (email/phone
+  vs DM-only). `segment` is "which of Fleek's own marketed customer tiers
+  are they in" (New Reseller / Full-Time Reseller / Business - straight
+  from joinfleek.com, not invented). A reseller can be `direct`-contactable
+  (happens to have an email) while still being a `new_reseller` for
+  messaging purposes - conflating the two would mean a beginner gets the
+  same pitch as a 200-sale/month full-time reseller just because of how we
+  happen to be able to reach them.
 - **Tier always dominates value.** A maxed-out brand-new lead can never
   outrank a low-value lead who's actively waiting on a reply, by design -
   see `tests/test_scoring.py::test_higher_value_never_crosses_a_tier_boundary`.

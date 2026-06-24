@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS leads (
     lead_key                TEXT PRIMARY KEY,
     source_lead_ids         TEXT NOT NULL,   -- comma-joined original lead_ids merged into this entity
     channel                 TEXT NOT NULL,   -- 'direct' (email/phone) or 'instagram_dm' (handle only)
+    lead_type                TEXT NOT NULL,   -- 'reseller' or 'store' (independent of channel)
+    segment                  TEXT NOT NULL,   -- 'new_reseller' | 'full_time_reseller' | 'business'
     source_label            TEXT,
     store_name              TEXT,
     contact_name            TEXT,

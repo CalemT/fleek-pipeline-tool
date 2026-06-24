@@ -5,10 +5,25 @@ scratch for every row.
 
 Stores get a fixed channel sequence (email -> call -> visit), driven off how
 many times they've already been touched and whether they've engaged.
-Resellers always go out as a DM, but the tone/content changes with tier.
+Resellers always go out as a DM, but the tone/content changes with tier
+*and* with which of Fleek's own customer segments they're in (new_reseller /
+full_time_reseller / business - see classify.py) - a beginner testing their
+first bundle and a full-time reseller doing 200 sales/month don't want the
+same pitch, and joinfleek.com itself markets to them differently.
 """
 
 FIRST_NAME_FALLBACK_STORE = "there"
+
+SEGMENT_HOOK = {
+    "new_reseller": ("you're just getting going - we do small minimum order "
+                      "quantities (10-20 pieces) so you can test what sells "
+                      "without overcommitting"),
+    "full_time_reseller": ("you're already moving real volume - we can get you "
+                            "better pricing on bigger orders and help keep "
+                            "stock consistent so growth doesn't stall on supply"),
+    "business": ("we supply wholesale vintage stock planned around your "
+                 "shop's calendar, so restocking doesn't depend on luck"),
+}
 
 
 def _greeting(lead) -> str:
@@ -50,11 +65,12 @@ def draft_message(lead, action_type: str) -> str:
     city = lead["city"]
 
     if action_type == "dm_cold":
-        hook = (f"saw you've got {listings} live listings and moving ~{velocity}/month"
-                if listings and velocity else "saw your shop and love the edit")
-        return (f"Hey! {hook} - we buy vintage/secondhand in bulk (100+ pieces at a time) "
-                f"for resellers like you on a B2B marketplace. Worth a quick chat about "
-                f"selling us a batch?")
+        hook = SEGMENT_HOOK.get(lead["segment"])
+        if not hook:
+            hook = (f"saw you've got {listings} live listings and moving ~{velocity}/month"
+                    if listings and velocity else "saw your shop and love the edit")
+        return (f"Hey! We supply vintage/secondhand stock in bulk (100+ pieces at a time) "
+                f"so resellers don't have to source piece-by-piece - {hook}. Worth a quick chat?")
 
     if action_type == "dm_followup":
         if last_text:
@@ -63,32 +79,33 @@ def draft_message(lead, action_type: str) -> str:
         return "Following up on this - still keen to chat? Happy to work around your schedule."
 
     if action_type == "dm_reengage":
-        return ("Hey, know it's been quiet - we're still keen to buy from you if the timing's "
-                "better now. No pressure, just flag if a bulk sale ever makes sense for you.")
+        return ("Hey, know it's been quiet - happy to get you set up with a bulk batch "
+                "whenever the timing's right. No pressure, just flag if restocking ever "
+                "makes sense for you.")
 
     if action_type == "email_intro":
-        return (f"Subject: Buying bulk from {store}\n\n"
-                f"Hi {name},\n\nWe buy secondhand/vintage stock in bulk (100+ pieces at a time) "
-                f"from shops like yours. Would you be open to a short call this week to see if "
-                f"it's a fit?\n\nBest,\nFleek")
+        hook = SEGMENT_HOOK.get(lead["segment"], "we supply wholesale vintage stock in bulk")
+        return (f"Subject: Wholesale vintage supply for {store}\n\n"
+                f"Hi {name},\n\n{hook[0].upper() + hook[1:]}. Would you be open to a "
+                f"short call this week to see if it's a fit?\n\nBest,\nFleek")
 
     if action_type == "email_followup":
         ref = f' You mentioned: "{last_text}".' if last_text else ""
-        return (f"Subject: Re: buying from {store}\n\n"
+        return (f"Subject: Re: wholesale supply for {store}\n\n"
                 f"Hi {name},\n\nFollowing up on our last chat.{ref} Keen to find a time this "
                 f"week to move things forward - does a quick call work?\n\nBest,\nFleek")
 
     if action_type == "call":
         ref = f' Last note from them: "{last_text}".' if last_text else ""
-        return (f"CALL SCRIPT - {store} ({city}): Confirm interest in selling bulk stock to "
-                f"Fleek, agree next step (visit or sample pickup).{ref}")
+        return (f"CALL SCRIPT - {store} ({city}): Confirm interest in stocking up via "
+                f"Fleek, agree next step (sample bundle or visit).{ref}")
 
     if action_type == "call_confirm":
         return (f"CALL SCRIPT - {store} ({city}): Confirm the booked call time and agenda; "
-                f"come ready to agree a first batch.")
+                f"come ready to agree a first order.")
 
     if action_type == "visit":
-        return (f"VISIT - {store} ({city}): In-person visit to view stock and agree a first "
-                f"purchase. Pair with other {city} visits this week to make the trip worth it.")
+        return (f"VISIT - {store} ({city}): In-person visit to show sample stock and agree "
+                f"a first order. Pair with other {city} visits this week to make the trip worth it.")
 
     return "Review lead manually."

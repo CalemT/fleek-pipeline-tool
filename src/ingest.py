@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 import pandas as pd
 
 from . import clean
-from .classify import classify_channel
+from .classify import classify_channel, classify_lead_type, classify_segment
 
 RAW_COLUMNS = [
     "lead_id", "source", "handle", "store_name", "contact_name", "email",
@@ -210,6 +210,11 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
 
             merged = _merge_fields(existing, c)
             merged["channel"] = classify_channel(merged["email"], merged["phone"], merged["handle"])
+            merged["lead_type"] = classify_lead_type(merged["store_name"], merged["handle"],
+                                                       merged["followers"], merged["active_listings"],
+                                                       merged["sales_velocity_30d"])
+            merged["segment"] = classify_segment(merged["lead_type"], merged["active_listings"],
+                                                  merged["sales_velocity_30d"])
             merged["updated_at"] = now
             leads_cache[existing["lead_key"]] = merged
             index.register(existing["lead_key"], c)
@@ -217,10 +222,15 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
         else:
             lead_key = f"lead:{c['lead_id']}"
             channel = classify_channel(c["email"], c["phone"], c["handle"])
+            lead_type = classify_lead_type(c["store_name"], c["handle"], c["followers"],
+                                            c["active_listings"], c["sales_velocity_30d"])
+            segment = classify_segment(lead_type, c["active_listings"], c["sales_velocity_30d"])
             new_lead = {
                 "lead_key": lead_key,
                 "source_lead_ids": c["lead_id"],
                 "channel": channel,
+                "lead_type": lead_type,
+                "segment": segment,
                 "source_label": c["source_label"],
                 "store_name": c["store_name"],
                 "contact_name": c["contact_name"],
@@ -251,14 +261,14 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
 
     upsert_sql = """
         INSERT INTO leads (
-            lead_key, source_lead_ids, channel, source_label, store_name,
+            lead_key, source_lead_ids, channel, lead_type, segment, source_label, store_name,
             contact_name, handle, email, phone, city, country, followers,
             active_listings, avg_listing_price_gbp, sales_velocity_30d,
             est_monthly_spend_gbp, stage, first_seen_date, last_touch_date,
             num_touches, last_inbound_text, assigned_bdr, notes,
             data_quality_flags, created_at, updated_at
         ) VALUES (
-            :lead_key, :source_lead_ids, :channel, :source_label, :store_name,
+            :lead_key, :source_lead_ids, :channel, :lead_type, :segment, :source_label, :store_name,
             :contact_name, :handle, :email, :phone, :city, :country, :followers,
             :active_listings, :avg_listing_price_gbp, :sales_velocity_30d,
             :est_monthly_spend_gbp, :stage, :first_seen_date, :last_touch_date,
@@ -267,6 +277,7 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
         )
         ON CONFLICT(lead_key) DO UPDATE SET
             source_lead_ids=excluded.source_lead_ids, channel=excluded.channel,
+            lead_type=excluded.lead_type, segment=excluded.segment,
             handle=excluded.handle, store_name=excluded.store_name,
             contact_name=excluded.contact_name, email=excluded.email,
             phone=excluded.phone, city=excluded.city, country=excluded.country,
