@@ -94,6 +94,22 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
   trivial to eyeball at 265 rows, not at 30,000.* Fixed by making the flag
   an actual exportable, value-sorted worklist (`review-queue`) instead of
   an implicit "someone will notice."
+- *Only Instagram had a daily cap; stores didn't.* Instagram's 40/day is a
+  platform-enforced number, so it got a cap from day one. Stores don't have
+  a platform rule, but a real team still can't send hundreds of emails and
+  make dozens of calls in a day - without a cap, this produces a queue of
+  thousands at 30k leads that nothing could ever work through. Fixed with
+  `--direct-cap` (default 60), same highest-score-first mechanism as the
+  Instagram cap.
+- *A real bug found while testing the fix above, not before it*: marking an
+  action `sent` updated `last_touch_date`/`num_touches` but never advanced
+  a lead's stage from `new`. Since the `new` tier is deliberately
+  cooldown-free (a never-contacted lead is always eligible), a lead that
+  stayed labelled `new` forever would never leave that tier and would
+  permanently win every day's queue, starving everything behind it. Caught
+  by actually simulating two days of sends and checking whether the queue
+  rotated (it didn't, at first) rather than trusting the cap alone to fix
+  things - see `tests/test_send_rotation.py` for the regression test.
 
 **Instrumented now, self-corrects once there's enough data:**
 - *The scoring rubric started as a judgment call, not something trained on

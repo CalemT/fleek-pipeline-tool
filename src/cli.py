@@ -81,8 +81,22 @@ def cmd_plan(args):
         dm_queue.append((lead, tier, score, "new"))
         slots_used += 1
 
-    direct_queue = [(lead, tier, score, "already_queued_today" if already else "new")
-                     for lead, tier, score, already in direct_candidates]
+    # Stores don't have a platform-enforced limit the way Instagram does, but
+    # a real team still can't send hundreds of personalized emails and make
+    # dozens of calls in a single day. Without a cap here, this silently
+    # produces an unusable queue at scale (thousands of "ready today" stores
+    # at 30k leads) even though nothing crashes - so it gets the same
+    # highest-score-first, capped-per-day treatment as the DM queue.
+    direct_queue = []
+    direct_slots_used = sum(1 for _, _, _, already in direct_candidates if already)
+    for lead, tier, score, already in direct_candidates:
+        if already:
+            direct_queue.append((lead, tier, score, "already_queued_today"))
+            continue
+        if direct_slots_used >= args.direct_cap:
+            continue
+        direct_queue.append((lead, tier, score, "new"))
+        direct_slots_used += 1
 
     now = datetime.now(timezone.utc).isoformat()
     for lead, tier, score, status in dm_queue + direct_queue:
@@ -103,11 +117,18 @@ def cmd_plan(args):
     _write_csv(OUTPUT_DIR / f"outreach_instagram_{today_iso}.csv", dm_queue, conn, today_iso)
     _write_csv(OUTPUT_DIR / f"outreach_stores_{today_iso}.csv", direct_queue, conn, today_iso, group_by_city=True)
 
+    direct_total_not_already = sum(1 for _, _, _, already in direct_candidates if not already)
+    direct_new_today = sum(1 for *_, s in direct_queue if s == "new")
+    direct_leftover = direct_total_not_already - direct_new_today
+
     print(f"[plan] date={today_iso}")
     print(f"  Instagram DM queue: {len(dm_queue)} / cap {args.dm_cap} "
           f"({sum(1 for *_, s in dm_queue if s=='new')} new, "
           f"{sum(1 for *_, s in dm_queue if s!='new')} already queued today)")
-    print(f"  Direct (store) queue: {len(direct_queue)} leads")
+    print(f"  Direct (store) queue: {len(direct_queue)} / cap {args.direct_cap} "
+          f"({direct_new_today} new, "
+          f"{sum(1 for *_, s in direct_queue if s!='new')} already queued today), "
+          f"{direct_leftover} left over for tomorrow")
     print(f"  -> output/outreach_instagram_{today_iso}.csv")
     print(f"  -> output/outreach_stores_{today_iso}.csv")
     conn.close()
@@ -156,8 +177,16 @@ def cmd_send(args):
         print(f"No action with id={args.action_id}")
         return
     conn.execute("UPDATE actions_log SET status='sent' WHERE id=?", (args.action_id,))
+    # A 'new' lead that's just been messaged is no longer "never contacted" -
+    # without this, it stays in the 'new' tier forever (which has no
+    # cooldown, by design, since a never-contacted lead is always eligible),
+    # and permanently starves every other lead behind it in the queue. Any
+    # later stage (replied/warm/negotiating/etc.) only ever advances from an
+    # actual inbound reply being recorded - sending doesn't change that.
     conn.execute(
-        "UPDATE leads SET last_touch_date=?, num_touches=num_touches+1, updated_at=? WHERE lead_key=?",
+        "UPDATE leads SET last_touch_date=?, num_touches=num_touches+1, updated_at=?, "
+        "stage = CASE WHEN stage='new' THEN 'contacted' ELSE stage END "
+        "WHERE lead_key=?",
         (action["action_date"], datetime.now(timezone.utc).isoformat(), action["lead_key"]),
     )
     conn.commit()
@@ -351,6 +380,10 @@ def main():
     p_plan = sub.add_parser("plan", help="Build today's outreach queue (idempotent per day)")
     p_plan.add_argument("--date", default=None, help="YYYY-MM-DD, defaults to today")
     p_plan.add_argument("--dm-cap", type=int, default=40)
+    p_plan.add_argument("--direct-cap", type=int, default=60,
+                         help="Max stores actioned (email/call/visit) per day - a "
+                              "team-capacity assumption, not a platform rule. Adjust "
+                              "to your actual team size.")
     p_plan.set_defaults(func=cmd_plan)
 
     p_send = sub.add_parser("send", help="Mark a queued action as sent")

@@ -20,10 +20,11 @@ pip install -r requirements.txt
 python -m src.cli ingest --file data/pipeline_data.xlsx --sheet pipeline --batch initial_handover
 
 # 2. Build today's outreach queue (run this every morning)
-python -m src.cli plan --date 2026-03-01
+python -m src.cli plan --date 2026-03-01 --dm-cap 40 --direct-cap 60
 
 # -> output/outreach_instagram_2026-03-01.csv   (today's 40 DMs, prioritized, pre-drafted)
-# -> output/outreach_stores_2026-03-01.csv      (every store, sequenced + grouped by city, pre-drafted)
+# -> output/outreach_stores_2026-03-01.csv      (today's capped store batch, sequenced + grouped
+#                                                 by city, pre-drafted; leftovers roll to tomorrow)
 
 # 3. Sanity-check the pipeline at any point
 python -m src.cli status
@@ -56,6 +57,16 @@ double-sent. Re-running `ingest` with a new file merges new leads in and
 folds duplicates (by email/phone/handle, not by `lead_id`) into the
 existing record instead of creating a second one. Both are what make this
 safe to run unattended every morning rather than by hand.
+
+**Important: `send` is what makes the queue rotate, not `plan` alone.**
+Both daily caps (40 DMs, 60 stores by default) only free up tomorrow's slots
+for leads that were actually marked `sent` - if you only ever run `plan`
+without `send`, the same highest-scored leads will keep winning every day
+(correctly - if you haven't reached out yet, of course they're still top
+priority) and the rest of the queue won't move. Leads in the `waiting_on_us`
+tier (replied/warm/negotiating/call_booked) are *meant* to keep reappearing
+every day regardless - they're not capped out by sending, only by actually
+resolving to won/lost.
 
 ## What it actually does, in order
 

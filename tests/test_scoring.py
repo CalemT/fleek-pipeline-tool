@@ -36,6 +36,16 @@ def test_waiting_on_us_outranks_new_outranks_followup():
     assert scoring.TIER_SCORE["follow_up_due"] > scoring.TIER_SCORE["re_engage"]
 
 
+def test_new_tier_has_no_cooldown_by_design():
+    # A never-contacted lead is always eligible - this is intentional, but it
+    # means whatever *sends* to a 'new' lead must advance its stage, or it
+    # would stay in this no-cooldown tier forever and starve the rest of the
+    # queue (verified end-to-end: see the rotation test run in git history -
+    # before fixing cmd_send to advance stage, the same leads won every day).
+    assert scoring.lead_tier("new", "direct", None, TODAY) == "new"
+    assert scoring.lead_tier("new", "direct", "2020-01-01", TODAY) == "new"
+
+
 def test_value_score_prefers_actual_spend_and_is_bounded():
     assert scoring.fit_score(9000, None, None, None) == 1.0
     assert scoring.fit_score(18000, None, None, None) == 1.0  # capped, doesn't exceed 1
