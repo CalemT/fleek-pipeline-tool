@@ -1,0 +1,4 @@
+# This folder is where new lead-drop files land for auto-ingest to pick up.
+# Empty on purpose - auto-ingest creates it automatically if it's missing,
+# this file just keeps the folder (and its purpose) visible in the repo.
+# Drop an .xlsx here and run: python -m src.cli auto-ingest --folder data/incoming
