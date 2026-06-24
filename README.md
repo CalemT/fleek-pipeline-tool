@@ -20,7 +20,7 @@ pip install -r requirements.txt
 python -m src.cli ingest --file data/pipeline_data.xlsx --sheet pipeline --batch initial_handover
 
 # 2. Build today's outreach queue (run this every morning)
-python -m src.cli plan --date 2026-03-01 --dm-cap 40 --direct-cap 60
+python -m src.cli plan --date 2026-03-01 --dm-cap 40 --email-cap 150 --call-cap 30 --visit-cap 5
 
 # -> output/outreach_instagram_2026-03-01.csv   (today's 40 DMs, prioritized, pre-drafted)
 # -> output/outreach_stores_2026-03-01.csv      (today's capped store batch, sequenced + grouped

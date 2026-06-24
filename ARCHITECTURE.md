@@ -105,8 +105,13 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
   a platform rule, but a real team still can't send hundreds of emails and
   make dozens of calls in a day - without a cap, this produces a queue of
   thousands at 30k leads that nothing could ever work through. Fixed with
-  `--direct-cap` (default 60), same highest-score-first mechanism as the
-  Instagram cap.
+  separate `--email-cap` / `--call-cap` / `--visit-cap` (defaults 150/30/5),
+  rather than one combined number - email can be automated and scales with
+  sender deliverability, not headcount, while calls and visits are still
+  genuinely human-time-limited; lumping them together either understated
+  email's real ceiling or overstated what a human team can do on the other
+  two. Same highest-score-first, capped-per-category mechanism as the
+  Instagram cap, just split by what's actually scarce in each case.
 - *A real bug found while testing the fix above, not before it*: marking an
   action `sent` updated `last_touch_date`/`num_touches` but never advanced
   a lead's stage from `new`. Since the `new` tier is deliberately

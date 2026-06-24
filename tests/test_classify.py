@@ -28,3 +28,12 @@ def test_hybrid_row_with_both_store_name_and_handle_is_still_a_store():
     # e.g. day-2 lead L0284: has both store_name AND a handle - store_name wins
     lead_type = classify.classify_lead_type("Maison Lab", "@heritageprelovedstudio", None, None, None)
     assert lead_type == "store"
+
+
+def test_action_categories_split_correctly():
+    from src import drafting
+    assert drafting.ACTION_CATEGORY["email_intro"] == "email"
+    assert drafting.ACTION_CATEGORY["email_followup"] == "email"
+    assert drafting.ACTION_CATEGORY["call"] == "call"
+    assert drafting.ACTION_CATEGORY["call_confirm"] == "call"
+    assert drafting.ACTION_CATEGORY["visit"] == "visit"

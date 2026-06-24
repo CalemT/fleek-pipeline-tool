@@ -14,6 +14,22 @@ same pitch, and joinfleek.com itself markets to them differently.
 
 FIRST_NAME_FALLBACK_STORE = "there"
 
+# Which real-world resource each store action type consumes. Email is the
+# one that genuinely scales with automation (an API into Gmail/an email
+# tool, AI-drafted, sent in bulk) - the real constraint there is sender
+# deliverability, not headcount. Calls and visits are still fundamentally
+# human time (or a deliberate, separate decision to use an AI voice agent,
+# which Fleek would need to choose to do, not something to assume here).
+# Lumping all three into one daily number either overstates what a human
+# team can do on calls/visits or understates how far email could scale.
+ACTION_CATEGORY = {
+    "email_intro": "email",
+    "email_followup": "email",
+    "call": "call",
+    "call_confirm": "call",
+    "visit": "visit",
+}
+
 SEGMENT_HOOK = {
     "new_reseller": ("you're just getting going - we do small minimum order "
                       "quantities (10-20 pieces) so you can test what sells "

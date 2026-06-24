@@ -81,22 +81,36 @@ def cmd_plan(args):
         dm_queue.append((lead, tier, score, "new"))
         slots_used += 1
 
-    # Stores don't have a platform-enforced limit the way Instagram does, but
-    # a real team still can't send hundreds of personalized emails and make
-    # dozens of calls in a single day. Without a cap here, this silently
-    # produces an unusable queue at scale (thousands of "ready today" stores
-    # at 30k leads) even though nothing crashes - so it gets the same
-    # highest-score-first, capped-per-day treatment as the DM queue.
+    # Stores don't have a platform-enforced limit the way Instagram does,
+    # but each action type they generate has a *different* real-world
+    # constraint - email can be automated and scales with sender
+    # deliverability, not headcount; calls and visits are still genuinely
+    # human time. One flat cap across all three either overstates what a
+    # human team can do on calls/visits, or understates how far email could
+    # scale with automation. So each category gets its own cap, and
+    # next_action_type has to be known *before* applying the cap (it no
+    # longer depends only on the cap being met).
     direct_queue = []
-    direct_slots_used = sum(1 for _, _, _, already in direct_candidates if already)
+    category_caps = {"email": args.email_cap, "call": args.call_cap, "visit": args.visit_cap}
+    category_slots_used = {"email": 0, "call": 0, "visit": 0}
+
     for lead, tier, score, already in direct_candidates:
         if already:
+            existing = conn.execute(
+                "SELECT action_type FROM actions_log WHERE lead_key=? AND action_date=? "
+                "ORDER BY id DESC LIMIT 1",
+                (lead["lead_key"], today_iso),
+            ).fetchone()
+            cat = drafting.ACTION_CATEGORY.get(existing["action_type"], "email") if existing else "email"
+            category_slots_used[cat] += 1
             direct_queue.append((lead, tier, score, "already_queued_today"))
             continue
-        if direct_slots_used >= args.direct_cap:
+        action_type = drafting.next_action_type(lead, tier)
+        cat = drafting.ACTION_CATEGORY[action_type]
+        if category_slots_used[cat] >= category_caps[cat]:
             continue
         direct_queue.append((lead, tier, score, "new"))
-        direct_slots_used += 1
+        category_slots_used[cat] += 1
 
     now = datetime.now(timezone.utc).isoformat()
     for lead, tier, score, status in dm_queue + direct_queue:
@@ -125,9 +139,10 @@ def cmd_plan(args):
     print(f"  Instagram DM queue: {len(dm_queue)} / cap {args.dm_cap} "
           f"({sum(1 for *_, s in dm_queue if s=='new')} new, "
           f"{sum(1 for *_, s in dm_queue if s!='new')} already queued today)")
-    print(f"  Direct (store) queue: {len(direct_queue)} / cap {args.direct_cap} "
-          f"({direct_new_today} new, "
-          f"{sum(1 for *_, s in direct_queue if s!='new')} already queued today), "
+    print(f"  Direct (store) queue: {len(direct_queue)} total "
+          f"(email {category_slots_used['email']}/{category_caps['email']}, "
+          f"call {category_slots_used['call']}/{category_caps['call']}, "
+          f"visit {category_slots_used['visit']}/{category_caps['visit']}), "
           f"{direct_leftover} left over for tomorrow")
     print(f"  -> output/outreach_instagram_{today_iso}.csv")
     print(f"  -> output/outreach_stores_{today_iso}.csv")
@@ -437,10 +452,18 @@ def main():
     p_plan = sub.add_parser("plan", help="Build today's outreach queue (idempotent per day)")
     p_plan.add_argument("--date", default=None, help="YYYY-MM-DD, defaults to today")
     p_plan.add_argument("--dm-cap", type=int, default=40)
-    p_plan.add_argument("--direct-cap", type=int, default=60,
-                         help="Max stores actioned (email/call/visit) per day - a "
-                              "team-capacity assumption, not a platform rule. Adjust "
-                              "to your actual team size.")
+    p_plan.add_argument("--email-cap", type=int, default=150,
+                         help="Max store emails/day. Email is the one channel that genuinely "
+                              "scales with automation (API into Gmail/an ESP, AI-drafted, sent "
+                              "in bulk) - this number is a conservative placeholder pending real "
+                              "sender deliverability limits, not a team-headcount constraint.")
+    p_plan.add_argument("--call-cap", type=int, default=30,
+                         help="Max store calls/day - a real human-capacity assumption "
+                              "(~30-40 dials/day is a typical single-BDR benchmark), not a "
+                              "platform rule. Multiply by number of reps actually making calls.")
+    p_plan.add_argument("--visit-cap", type=int, default=5,
+                         help="Max store visits/day - the most genuinely constrained action "
+                              "(travel time, not just willingness). Pairs with city grouping.")
     p_plan.set_defaults(func=cmd_plan)
 
     p_send = sub.add_parser("send", help="Mark a queued action as sent")
