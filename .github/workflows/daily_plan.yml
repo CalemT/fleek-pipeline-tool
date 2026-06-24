@@ -10,6 +10,9 @@ on:
     - cron: "0 7 * * *"
   workflow_dispatch: {}
 
+permissions:
+  contents: write   # needed for the keep-alive commit below
+
 jobs:
   plan:
     runs-on: ubuntu-latest
@@ -57,3 +60,23 @@ jobs:
           name: outreach-${{ github.run_id }}
           path: output/*.csv
           retention-days: 14
+
+      # GitHub auto-disables a scheduled workflow after 60 days with no
+      # repository activity at all (a documented platform behaviour, not a
+      # bug) - silent until someone happens to notice the cron stopped
+      # firing. A real commit every successful run resets that clock every
+      # single day, so it can never go quiet for 60 days while this is
+      # actually working. Doubles as a visible, in-repo log that the bot
+      # really did run, without digging through the Actions tab.
+      - name: Record run timestamp (keep-alive against GitHub's 60-day auto-disable)
+        run: |
+          echo "# Pipeline status" > STATUS.md
+          echo "" >> STATUS.md
+          echo "Last successful automated run: $(date -u +"%Y-%m-%d %H:%M UTC")" >> STATUS.md
+          echo "" >> STATUS.md
+          echo "See the Actions tab for full run history and today's outreach queues." >> STATUS.md
+          git config user.name "fleek-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add STATUS.md
+          git diff --staged --quiet || git commit -m "Automated daily run: $(date -u +%Y-%m-%d)"
+          git push
