@@ -366,6 +366,59 @@ def cmd_recalibrate(args):
     conn.close()
 
 
+def cmd_auto_ingest(args):
+    """Scan a folder for lead-drop files and ingest any that haven't been
+    seen before - this is the piece that makes 'run every morning'
+    meaningful instead of just a sentence in the README. In production this
+    folder is wherever new exports land (a scheduled CRM export, an
+    Instagram-scraper output, etc); here it's `data/incoming/` for the demo.
+    Idempotent by checking `raw_intake` for a matching batch_label before
+    touching a file twice, the same way `ingest` is idempotent per-row."""
+    import glob
+
+    import pandas as pd
+
+    conn = db.connect(args.db)
+    folder = Path(args.folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    files = sorted(glob.glob(str(folder / "*.xlsx")))
+
+    if not files:
+        print(f"[auto-ingest] no files found in {folder}")
+        conn.close()
+        return
+
+    total_new, total_merged, batches_run = 0, 0, 0
+    for filepath in files:
+        try:
+            sheet_names = pd.ExcelFile(filepath).sheet_names
+        except Exception as e:
+            print(f"[auto-ingest] could not read {filepath}: {e}")
+            continue
+        for sheet in sheet_names:
+            if sheet.lower() == "readme":
+                continue
+            batch_label = f"{Path(filepath).name}:{sheet}"
+            already_seen = conn.execute(
+                "SELECT 1 FROM raw_intake WHERE batch_label=? LIMIT 1", (batch_label,)
+            ).fetchone()
+            if already_seen:
+                continue
+            stats = ingest_mod.ingest_batch(conn, filepath, sheet, batch_label)
+            print(f"[auto-ingest] new batch '{batch_label}': "
+                  f"{stats['new_leads']} new, {stats['merged_into_existing']} merged")
+            total_new += stats["new_leads"]
+            total_merged += stats["merged_into_existing"]
+            batches_run += 1
+
+    if batches_run == 0:
+        print(f"[auto-ingest] {len(files)} file(s) in {folder}, nothing new to ingest")
+    else:
+        print(f"[auto-ingest] {batches_run} new batch(es): {total_new} new leads, "
+              f"{total_merged} merged")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -376,6 +429,10 @@ def main():
     p_ingest.add_argument("--sheet", required=True)
     p_ingest.add_argument("--batch", required=True, help="Label for this batch, e.g. 'initial_handover'")
     p_ingest.set_defaults(func=cmd_ingest)
+
+    p_auto = sub.add_parser("auto-ingest", help="Pick up any new file dropped in a watched folder")
+    p_auto.add_argument("--folder", default="data/incoming")
+    p_auto.set_defaults(func=cmd_auto_ingest)
 
     p_plan = sub.add_parser("plan", help="Build today's outreach queue (idempotent per day)")
     p_plan.add_argument("--date", default=None, help="YYYY-MM-DD, defaults to today")

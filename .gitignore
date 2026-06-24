@@ -4,5 +4,7 @@ __pycache__/
 venv/
 *.db
 output/
+logs/
+data/incoming/*.xlsx
 .DS_Store
 *.egg-info/

@@ -90,6 +90,12 @@ Three different kinds of "not perfect yet," sorted by what they actually need:
   flagging any merge where phone is the *only* matching field with no
   corroborating email or handle as `low_confidence_phone_merge`, rather than
   silently trusting it. `python -m src.cli review-queue` exports these.
+- *The brief pictures this running every morning, agent-run - but there was
+  no actual scheduling artifact, just a description of one.* Fixed with
+  `run_daily.sh` (picks up any new file in `data/incoming/` via the new
+  `auto-ingest` command, then plans the day) and
+  `.github/workflows/daily_plan.yml`, which runs that script on a schedule
+  on GitHub's infrastructure - no laptop has to be on for it to happen.
 - *A handful of flagged rows (malformed emails, low-confidence merges) is
   trivial to eyeball at 265 rows, not at 30,000.* Fixed by making the flag
   an actual exportable, value-sorted worklist (`review-queue`) instead of

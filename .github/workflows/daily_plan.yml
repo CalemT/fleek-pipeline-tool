@@ -1,0 +1,60 @@
+name: Daily outreach plan
+
+# This is what makes "picture it running every morning" real instead of a
+# sentence in the README - no person has to remember to run anything.
+#
+# Schedule below is 7am UTC daily; also runnable on-demand from the Actions
+# tab for testing (workflow_dispatch).
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # The SQLite DB is the tool's only state (who's been contacted, what's
+      # in cooldown, etc). GitHub Actions runners are thrown away after every
+      # run, so without this the tool would "forget" everything and re-plan
+      # from scratch each morning. This cache-as-poor-mans-database trick is
+      # fine for a lightweight scheduled bot like this one; a real production
+      # setup at Fleek's actual scale would point this at a hosted Postgres
+      # instance instead (same SQL, see ARCHITECTURE.md) rather than relying
+      # on GitHub's cache, which isn't guaranteed-durable storage.
+      - name: Restore pipeline database
+        uses: actions/cache/restore@v4
+        with:
+          path: output/fleek.db
+          key: fleek-db-${{ github.run_id }}
+          restore-keys: fleek-db-
+
+      # Placeholder for wherever new lead-drop files actually come from in
+      # production (a scheduled CRM export, an Instagram-scraper output,
+      # etc) - they'd land in data/incoming/ here before this step runs.
+      # auto-ingest itself is already idempotent either way.
+      - name: Run daily pipeline
+        run: ./run_daily.sh
+
+      - name: Save pipeline database
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: output/fleek.db
+          key: fleek-db-${{ github.run_id }}
+
+      - name: Upload today's outreach queues
+        uses: actions/upload-artifact@v4
+        with:
+          name: outreach-${{ github.run_id }}
+          path: output/*.csv
+          retention-days: 14

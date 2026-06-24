@@ -51,6 +51,30 @@ python -m src.cli calibration
 python -m src.cli recalibrate
 ```
 
+## Running this every morning, unattended
+
+This is the part of the brief worth taking literally: "picture it running
+every morning." Two pieces make that real instead of a sentence in a README:
+
+- **`run_daily.sh`** - picks up any new lead-drop file sitting in
+  `data/incoming/` (via the new `auto-ingest` command, idempotent the same
+  way `ingest` is) and then builds the day's plan. Safe to run more than
+  once a day or schedule via local cron.
+- **`.github/workflows/daily_plan.yml`** - runs `run_daily.sh` on a schedule
+  (7am UTC) on GitHub's infrastructure, with zero dependency on anyone's
+  laptop being on. The SQLite DB persists between runs via GitHub's cache
+  (a reasonable trick for a lightweight scheduled bot like this one; a real
+  production setup at Fleek's actual scale would point this at a hosted
+  Postgres instance instead - see `ARCHITECTURE.md`). Today's CSVs come out
+  as a downloadable workflow artifact every run.
+
+If you'd rather have a visible morning briefing than dig through GitHub,
+Claude Cowork's Scheduled Tasks can run the same commands and summarize the
+output - worth knowing it only runs while your computer is awake and the
+desktop app is open (it catches up on wake if you miss a run), so it's a
+good complement to the GitHub Actions workflow for visibility, not a
+replacement for the part that needs to run with zero dependencies.
+
 Re-running `plan` on the *same* date is a no-op for anyone already queued
 that day - the CSV comes back identical, nothing gets double-drafted or
 double-sent. Re-running `ingest` with a new file merges new leads in and
