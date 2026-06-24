@@ -72,6 +72,21 @@ paced and somewhat manual anyway.
   of one `INSERT`/`UPDATE` per row.
 - **Scoring is a single indexed query** (`stage NOT IN ('won','lost')`) plus
   a per-row pure-function score - no joins, no N+1 queries.
+- **The full `plan` command (scoring + CSV writing) was actually measured at
+  30k, not just ingest.** It completes in ~0.6s, because the per-row CSV
+  lookups are bounded by the *queue size* (capped at a few hundred), not the
+  full 30,000-lead table.
+- **Stays flat over time, not just on day one.** Ran 15 simulated days of
+  `plan` + `send` at 30k scale, watching `actions_log` grow to ~3,400 rows -
+  every day's `plan` call still completed in ~0.6s, no slowdown as the log
+  grows, because lookups are indexed on `(lead_key, action_date)` rather
+  than scanning the whole table.
+- **Speed isn't the same as throughput, and `backlog-forecast` is what
+  surfaces that distinction.** The code handles 30,000 leads fine. Whether
+  the *business* can actually work through them is a different question -
+  at 30k, the Instagram backlog alone would take ~341 days to clear at the
+  platform's fixed 40/day cap. See README for what this means for the
+  "scaling" debrief question.
 - **What would change next**, beyond 30k: swap SQLite for Postgres (same
   SQL, just a different connection string - nothing here is SQLite-specific
   syntax beyond `ON CONFLICT`, which Postgres also supports); move the

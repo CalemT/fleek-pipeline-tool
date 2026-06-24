@@ -75,6 +75,20 @@ desktop app is open (it catches up on wake if you miss a run), so it's a
 good complement to the GitHub Actions workflow for visibility, not a
 replacement for the part that needs to run with zero dependencies.
 
+## Will this actually keep up at scale?
+
+`python -m src.cli backlog-forecast` answers this directly instead of
+leaving it to guesswork: it counts everyone currently eligible for outreach
+and divides by today's caps to estimate days-to-clear per channel. At the
+265-lead handover this is a non-issue (clears in 1-3 days). At a synthetic
+30,000-lead test, it's not: ~341 days for Instagram (the platform's fixed
+40/day cap is brutal at scale) and ~66 days for stores. That's the real
+number behind "how do you get to 30,000 without quality falling off" -
+the honest answer involves running multiple Instagram accounts and/or
+deprioritizing it relative to automatable channels, not just "the code
+handles it" (the code does handle it - the backlog is a business problem,
+not a performance one, and this command is what surfaces that distinction).
+
 ## Plugging in Fleek's real numbers
 
 Every capacity number and conversion rate in this tool is currently a

@@ -477,6 +477,47 @@ def cmd_rebalance_caps(args):
           "config/assumptions.yaml by hand if you agree with it.")
 
 
+def cmd_backlog_forecast(args):
+    """How long would it take to work through everything currently eligible,
+    at today's caps? This came out of actually testing the tool at 30,000
+    leads rather than just trusting the caps were reasonable - the backlog
+    turned out to be measured in months, not days, which is exactly the
+    kind of number that should be surfaced automatically every time you
+    check status, not discovered by hand once."""
+    today = date.today()
+    conn = db.connect(args.db)
+    leads = conn.execute("SELECT * FROM leads WHERE stage NOT IN ('won','lost')").fetchall()
+
+    dm_backlog, direct_backlog = 0, 0
+    for lead in leads:
+        tier, _ = scoring.score_lead(lead, today)
+        if tier is None:
+            continue
+        if lead["channel"] == "instagram_dm":
+            dm_backlog += 1
+        else:
+            direct_backlog += 1
+
+    caps = cfg.load_config()["daily_caps"]
+    direct_daily_throughput = caps["email"] + caps["call"] + caps["visit"]
+
+    dm_days = dm_backlog / caps["instagram_dm"] if caps["instagram_dm"] else float("inf")
+    direct_days = direct_backlog / direct_daily_throughput if direct_daily_throughput else float("inf")
+
+    print(f"[backlog-forecast] {dm_backlog} Instagram-eligible leads, "
+          f"{direct_backlog} store-eligible leads right now")
+    print(f"[backlog-forecast] Instagram: {dm_backlog} / {caps['instagram_dm']} per day "
+          f"= ~{dm_days:.0f} days to clear at current cap")
+    print(f"[backlog-forecast] Stores: {direct_backlog} / {direct_daily_throughput} per day "
+          f"(email+call+visit combined) = ~{direct_days:.0f} days to clear at current caps")
+    if max(dm_days, direct_days) > 14:
+        print("[backlog-forecast] NOTE: this exceeds two weeks at current capacity - this is "
+              "the number to bring to a conversation about hiring, multiple Instagram "
+              "accounts, or automation, before the backlog itself becomes the bottleneck "
+              "rather than lead quality.")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -530,6 +571,9 @@ def main():
 
     p_rebal = sub.add_parser("rebalance-caps", help="Recommend cap changes from real channel performance data")
     p_rebal.set_defaults(func=cmd_rebalance_caps)
+
+    p_backlog = sub.add_parser("backlog-forecast", help="Estimate days to clear the current backlog at today's caps")
+    p_backlog.set_defaults(func=cmd_backlog_forecast)
 
     args = p.parse_args()
     args.func(args)
