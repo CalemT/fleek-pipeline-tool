@@ -44,13 +44,15 @@ def load_batch(path: str, sheet_name) -> pd.DataFrame:
 
 def _clean_row(row) -> dict:
     email, email_malformed = clean.clean_email(row["email"])
-    phone_disp, phone_key = clean.clean_phone(row["phone"])
+    phone, phone_malformed, phone_region_guessed = clean.clean_phone(row["phone"])
     handle = clean.clean_handle(row["handle"])
     flags = []
     if email_malformed:
         flags.append("malformed_email_fixed")
     if pd.notna(row["email"]) and email is None:
         flags.append("malformed_email_unrecoverable")
+    if phone_malformed:
+        flags.append("malformed_phone_unrecoverable")
 
     return dict(
         lead_id=str(row["lead_id"]).strip(),
@@ -59,8 +61,8 @@ def _clean_row(row) -> dict:
         store_name=None if pd.isna(row["store_name"]) else str(row["store_name"]).strip(),
         contact_name=None if pd.isna(row["contact_name"]) else str(row["contact_name"]).strip(),
         email=email,
-        phone=phone_disp,
-        phone_key=phone_key,
+        phone=phone,
+        phone_region_guessed=phone_region_guessed,
         city=None if pd.isna(row["city"]) else str(row["city"]).strip(),
         country=None if pd.isna(row["country"]) else str(row["country"]).strip(),
         followers=clean.clean_numeric(row["followers"]),
@@ -86,32 +88,36 @@ class MatchIndex:
     of O(n^2): without it, matching each new row would mean scanning the
     (growing) leads table on every row, which is fine at 265 rows and falls
     over hard at 30,000+.
+
+    Phone matching is an exact E.164 string match - `clean.clean_phone`
+    does real parsing via the `phonenumbers` library, so the same number
+    written three different ways already normalizes to one identical
+    string, with no fuzzy/heuristic matching needed (and no cross-country
+    collision risk from a digits-stripping shortcut).
     """
 
     def __init__(self, conn):
-        self.by_email, self.by_phone_key, self.by_handle = {}, {}, {}
+        self.by_email, self.by_phone, self.by_handle = {}, {}, {}
         for row in conn.execute(
             "SELECT lead_key, email, phone, handle FROM leads"
         ).fetchall():
             if row["email"]:
                 self.by_email[row["email"]] = row["lead_key"]
             if row["phone"]:
-                digits = "".join(ch for ch in row["phone"] if ch.isdigit())
-                if digits:
-                    self.by_phone_key[digits[-9:]] = row["lead_key"]
+                self.by_phone[row["phone"]] = row["lead_key"]
             if row["handle"]:
                 self.by_handle[row["handle"]] = row["lead_key"]
 
     def find(self, c: dict):
         """Returns (lead_key, match_type) or (None, None). match_type tells
-        the caller *which* field matched, so a phone-only match (the
-        riskiest one - last-9-digits collisions get more likely, not less,
-        as the table grows past 30k) can be flagged for human review instead
-        of silently trusted like an email or handle match."""
+        the caller *which* field matched - a phone-only match where the
+        number's country had to be guessed (no explicit country code in
+        the raw data) is still flagged lower-confidence than email/handle,
+        since that's the one remaining real ambiguity."""
         if c["email"] and c["email"] in self.by_email:
             return self.by_email[c["email"]], "email"
-        if c["phone_key"] and c["phone_key"] in self.by_phone_key:
-            return self.by_phone_key[c["phone_key"]], "phone"
+        if c["phone"] and c["phone"] in self.by_phone:
+            return self.by_phone[c["phone"]], "phone"
         if c["handle"] and c["handle"] in self.by_handle:
             return self.by_handle[c["handle"]], "handle"
         return None, None
@@ -119,8 +125,8 @@ class MatchIndex:
     def register(self, lead_key: str, c: dict):
         if c["email"]:
             self.by_email[c["email"]] = lead_key
-        if c["phone_key"]:
-            self.by_phone_key[c["phone_key"]] = lead_key
+        if c["phone"]:
+            self.by_phone[c["phone"]] = lead_key
         if c["handle"]:
             self.by_handle[c["handle"]] = lead_key
 
@@ -196,16 +202,14 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
             leads_cache[match_key] = existing
 
         if existing:
-            # A phone-only match with no corroborating email or handle on
-            # either side is the case most likely to be a false merge
-            # (different people, same last-9-digits) - flag it rather than
-            # silently trusting it, especially as this becomes more likely
-            # at scale.
-            corroborated = bool(
-                (c["email"] and existing["email"] and c["email"] == existing["email"])
-                or (c["handle"] and existing["handle"] and c["handle"] == existing["handle"])
-            )
-            if match_type == "phone" and not corroborated:
+            # With real E.164 phone parsing, a phone-only match is exact-string
+            # equality, not a fuzzy heuristic - the residual risk isn't
+            # cross-country collision anymore, it's the GB region guess applied
+            # to numbers with no explicit country code (every non-UK number
+            # actually seen in this data carries an explicit +CC, so this is a
+            # forward-looking safeguard against a future bad batch, not a known
+            # live issue). Flag only that narrower case for review.
+            if match_type == "phone" and c.get("phone_region_guessed"):
                 c["flags"].append("low_confidence_phone_merge")
 
             merged = _merge_fields(existing, c)

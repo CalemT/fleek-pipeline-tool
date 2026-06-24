@@ -8,6 +8,7 @@ import re
 import json
 from datetime import datetime
 import pandas as pd
+import phonenumbers
 
 # ---- stage canonicalization -------------------------------------------------
 
@@ -93,31 +94,52 @@ def clean_date(raw, default_year=2026):
 # ---- phone / email -----------------------------------------------------------
 
 def clean_phone(raw):
-    """Normalize to a comparable digits-only form with a best-guess leading
-    country code, used both for display and for de-dup matching.
-    Returns (normalized_display, digits_key) or (None, None).
+    """Normalize to a real, canonical E.164 number using Google's actual
+    libphonenumber (via the `phonenumbers` package) - not a digits-stripping
+    heuristic. This matters for de-dup correctness: a previous version
+    matched phones on their last 9 digits to tolerate +44/0044/0-prefix
+    formatting differences, which works for the SAME UK number written
+    three ways, but could in principle collide two DIFFERENT real numbers
+    from different countries that happen to share their last 9 digits
+    (e.g. a UK and a US number). Real E.164 parsing normalizes formatting
+    variance to an identical string for the same number, while keeping
+    genuinely different numbers (different country) distinct - so the
+    de-dup key can be an exact string match instead of a fuzzy one.
+
+    Returns (e164_or_None, malformed_bool, was_region_guessed_bool).
+    `was_region_guessed` is True when the raw string had no explicit
+    country code (no leading '+' or '00') and we assumed GB, since that's
+    the only real residual ambiguity: a future batch with a bare-digit
+    non-UK number would be misparsed. Every non-UK number actually seen in
+    this dataset carries an explicit '+CC', so this is a forward-looking
+    safeguard, not a known live bug - but it's why the caller still flags
+    these matches as lower-confidence than an explicit-country-code match.
     """
     if pd.isna(raw) or str(raw).strip() == "":
-        return None, None
+        return None, False, False
     s = str(raw).strip()
-    digits = re.sub(r"\D", "", s)
-    if not digits:
-        return None, None
-
-    if s.startswith("+"):
-        e164 = "+" + digits
-    elif digits.startswith("00"):
-        e164 = "+" + digits[2:]
-    elif digits.startswith("0"):
-        # UK-style local format e.g. 07318 272813 -> assume UK +44
-        e164 = "+44" + digits[1:]
-    else:
-        # bare digits, e.g. '7366811166' -> assume UK mobile missing leading 0
-        e164 = "+44" + digits if len(digits) == 10 else "+" + digits
-
-    # dedup key: last 9 significant digits, strips country-code/leading-zero ambiguity
-    key = digits[-9:] if len(digits) >= 9 else digits
-    return e164, key
+    region_guessed = not (s.startswith("+") or re.match(r"^00\d", s))
+    # phonenumbers needs an explicit '+' for international format - it
+    # doesn't infer that a leading '00' is the international dialing
+    # prefix without already knowing the calling region, so normalize it
+    # here rather than let a perfectly fine '0044...' number fail to parse.
+    if re.match(r"^00\d", s):
+        s = "+" + s[2:]
+    try:
+        parsed = phonenumbers.parse(s, "GB" if region_guessed else None)
+        # is_valid_number() checks against real-world *assigned* number
+        # ranges, which is the wrong tool here - it would reject perfectly
+        # well-formed numbers that simply aren't in current real-world use
+        # (including this case study's own data, parts of which appear to
+        # be synthetic/generated). is_possible_number() checks structural
+        # plausibility (length, format) without that real-world database
+        # lookup, which is the right bar for cleaning CRM-style data.
+        if not phonenumbers.is_possible_number(parsed):
+            return None, True, region_guessed
+        e164 = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+        return e164, False, region_guessed
+    except phonenumbers.NumberParseException:
+        return None, True, region_guessed
 
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
