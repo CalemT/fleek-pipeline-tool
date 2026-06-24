@@ -35,6 +35,14 @@ python -m src.cli plan --date 2026-03-02
 # 5. When a DM/email/call actually goes out, mark it sent (advances the cooldown
 #    clock so the same lead doesn't get hit again tomorrow)
 python -m src.cli send --action-id 17
+
+# 6. Export the data-quality backlog as a sorted worklist (malformed contacts,
+#    low-confidence merges) instead of leaving it for someone to notice
+python -m src.cli review-queue
+
+# 7. Sanity-check the scoring rubric against real outcomes, once leads have
+#    actually resolved won/lost through the tool's own loop
+python -m src.cli calibration
 ```
 
 Re-running `plan` on the *same* date is a no-op for anyone already queued

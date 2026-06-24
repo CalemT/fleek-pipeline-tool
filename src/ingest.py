@@ -103,13 +103,18 @@ class MatchIndex:
                 self.by_handle[row["handle"]] = row["lead_key"]
 
     def find(self, c: dict):
+        """Returns (lead_key, match_type) or (None, None). match_type tells
+        the caller *which* field matched, so a phone-only match (the
+        riskiest one - last-9-digits collisions get more likely, not less,
+        as the table grows past 30k) can be flagged for human review instead
+        of silently trusted like an email or handle match."""
         if c["email"] and c["email"] in self.by_email:
-            return self.by_email[c["email"]]
+            return self.by_email[c["email"]], "email"
         if c["phone_key"] and c["phone_key"] in self.by_phone_key:
-            return self.by_phone_key[c["phone_key"]]
+            return self.by_phone_key[c["phone_key"]], "phone"
         if c["handle"] and c["handle"] in self.by_handle:
-            return self.by_handle[c["handle"]]
-        return None
+            return self.by_handle[c["handle"]], "handle"
+        return None, None
 
     def register(self, lead_key: str, c: dict):
         if c["email"]:
@@ -183,7 +188,7 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
 
     for _, raw_row in df.iterrows():
         c = _clean_row(raw_row)
-        match_key = index.find(c)
+        match_key, match_type = index.find(c)
         existing = leads_cache.get(match_key) if match_key else None
         if match_key and existing is None:
             row = conn.execute("SELECT * FROM leads WHERE lead_key=?", (match_key,)).fetchone()
@@ -191,6 +196,18 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
             leads_cache[match_key] = existing
 
         if existing:
+            # A phone-only match with no corroborating email or handle on
+            # either side is the case most likely to be a false merge
+            # (different people, same last-9-digits) - flag it rather than
+            # silently trusting it, especially as this becomes more likely
+            # at scale.
+            corroborated = bool(
+                (c["email"] and existing["email"] and c["email"] == existing["email"])
+                or (c["handle"] and existing["handle"] and c["handle"] == existing["handle"])
+            )
+            if match_type == "phone" and not corroborated:
+                c["flags"].append("low_confidence_phone_merge")
+
             merged = _merge_fields(existing, c)
             merged["channel"] = classify_channel(merged["email"], merged["phone"], merged["handle"])
             merged["updated_at"] = now

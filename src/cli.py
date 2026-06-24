@@ -182,6 +182,76 @@ def cmd_status(args):
     conn.close()
 
 
+def cmd_review_queue(args):
+    """Export flagged leads as an actual worklist, sorted by commercial
+    value, instead of leaving 'someone notices the flag' implicit. At 265
+    rows a couple of flags are trivial to spot; at 30,000 the same ~1% flag
+    rate is a few hundred rows that need to be triaged like any other queue."""
+    conn = db.connect(args.db)
+    rows = conn.execute(
+        "SELECT * FROM leads WHERE data_quality_flags != '[]' ORDER BY "
+        "COALESCE(est_monthly_spend_gbp, 0) DESC"
+    ).fetchall()
+
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    path = OUTPUT_DIR / "data_quality_review.csv"
+    out_rows = [{
+        "lead_key": r["lead_key"],
+        "store_name": r["store_name"],
+        "handle": r["handle"],
+        "email": r["email"],
+        "phone": r["phone"],
+        "flags": r["data_quality_flags"],
+        "est_monthly_spend_gbp": r["est_monthly_spend_gbp"],
+        "stage": r["stage"],
+        "source_lead_ids": r["source_lead_ids"],
+    } for r in rows]
+
+    if out_rows:
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(out_rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(out_rows)
+    else:
+        path.write_text("")
+
+    print(f"[review-queue] {len(out_rows)} flagged leads -> {path}")
+    conn.close()
+
+
+def cmd_calibration(args):
+    """Sanity-check the scoring rubric against real outcomes: for leads that
+    have actually resolved (won/lost), what score did they have at the time
+    of their last action? This is the seed of a real feedback loop - with
+    only 9 won / 14 lost today there isn't enough signal to retrain
+    anything, but every action's score is already logged in `actions_log`,
+    so the moment there's enough outcome data this check tells you whether
+    the rubric is actually predictive or just a plausible guess."""
+    conn = db.connect(args.db)
+    rows = conn.execute(
+        """SELECT l.stage, a.score FROM leads l
+           JOIN actions_log a ON a.lead_key = l.lead_key
+           WHERE l.stage IN ('won','lost')"""
+    ).fetchall()
+    if not rows:
+        print("[calibration] No actions logged yet for resolved (won/lost) leads.\n"
+              "This is expected on a freshly-ingested handover: the leads that are "
+              "already won/lost arrived at that stage before this tool existed, so "
+              "there's no scored action in `actions_log` tracing how they got there.\n"
+              "This check only becomes meaningful for leads that resolve to won/lost "
+              "*after* going through the tool's own plan/send loop - i.e. check back "
+              "in a few weeks of real usage, not on day one.")
+        return
+    won = [r["score"] for r in rows if r["stage"] == "won"]
+    lost = [r["score"] for r in rows if r["stage"] == "lost"]
+    avg = lambda xs: sum(xs) / len(xs) if xs else None
+    print(f"[calibration] won leads (n={len(won)}): avg last-action score = {avg(won)}")
+    print(f"[calibration] lost leads (n={len(lost)}): avg last-action score = {avg(lost)}")
+    print("If 'won' scores aren't meaningfully higher than 'lost' scores once n is "
+          "large enough, the rubric's weights need revisiting - not just more data.")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -204,6 +274,12 @@ def main():
 
     p_status = sub.add_parser("status", help="Summary of the canonical pipeline")
     p_status.set_defaults(func=cmd_status)
+
+    p_review = sub.add_parser("review-queue", help="Export flagged leads as a sorted worklist")
+    p_review.set_defaults(func=cmd_review_queue)
+
+    p_calib = sub.add_parser("calibration", help="Check whether the scoring rubric matches real outcomes")
+    p_calib.set_defaults(func=cmd_calibration)
 
     args = p.parse_args()
     args.func(args)

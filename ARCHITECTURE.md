@@ -80,6 +80,44 @@ paced and somewhat manual anyway.
   batch; and shard `plan` by assigned BDR / region if a single run starts
   taking too long for one morning.
 
+## Honest limitations, and what's actually done about each
+
+Three different kinds of "not perfect yet," sorted by what they actually need:
+
+**Fixed in this build:**
+- *Phone-matching collisions get more likely at scale, not less* (matching
+  on last-9-digits to tolerate `+44`/`0044`/leading-zero formats). Fixed by
+  flagging any merge where phone is the *only* matching field with no
+  corroborating email or handle as `low_confidence_phone_merge`, rather than
+  silently trusting it. `python -m src.cli review-queue` exports these.
+- *A handful of flagged rows (malformed emails, low-confidence merges) is
+  trivial to eyeball at 265 rows, not at 30,000.* Fixed by making the flag
+  an actual exportable, value-sorted worklist (`review-queue`) instead of
+  an implicit "someone will notice."
+
+**Instrumented now, self-corrects once there's enough data:**
+- *The scoring rubric (tier + value) is a judgment call, not something
+  trained on outcomes* - there are only 9 won / 14 lost leads in the
+  handover, nowhere near enough to validate it. Every action already logs
+  the score the lead had at the time (`actions_log.score`), so the moment
+  enough leads resolve to won/lost *through the tool's own loop*, run
+  `python -m src.cli calibration` to check whether higher-scored leads
+  actually convert more - and revisit the weights in `scoring.py` if not.
+  (On a freshly-ingested handover this correctly reports no data yet -
+  the already-resolved leads got there before the tool existed.)
+
+**Known limitation, not worth building yet:**
+- *One Instagram sending account means the 40/day cap doesn't scale to
+  30,000 leads* - getting through the backlog would take years at that
+  rate. The real fix (multiple warmed accounts, each with its own cap and
+  cooldown pool) is an ops decision about Fleek's actual Instagram
+  presence, not a code problem - building multi-account support now would
+  be solving a problem that doesn't exist yet.
+- *SQLite has a single-writer lock* - fine for one daily `plan` run; would
+  matter if multiple reps/processes wrote concurrently. The schema uses
+  standard SQL (`ON CONFLICT` aside, which Postgres also supports), so this
+  is a connection-string swap when it's actually needed, not a rewrite.
+
 ## Why these specific design choices
 
 - **Tier beats value, always.** The case study's own framing - "a lot of
