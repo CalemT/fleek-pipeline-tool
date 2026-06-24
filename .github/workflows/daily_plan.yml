@@ -31,8 +31,14 @@ jobs:
       # setup at Fleek's actual scale would point this at a hosted Postgres
       # instance instead (same SQL, see ARCHITECTURE.md) rather than relying
       # on GitHub's cache, which isn't guaranteed-durable storage.
-      - name: Restore pipeline database
-        uses: actions/cache/restore@v4
+      #
+      # Uses the combined cache action (restore + automatic save at job end)
+      # rather than the separate restore/save actions - the split version hit
+      # an intermittent "Cache save failed" on GitHub's backend during actual
+      # testing of this workflow; the combined action is the far more common,
+      # better-tested pattern and avoids that failure mode.
+      - name: Restore/save pipeline database
+        uses: actions/cache@v4
         with:
           path: output/fleek.db
           key: fleek-db-${{ github.run_id }}
@@ -44,13 +50,6 @@ jobs:
       # auto-ingest itself is already idempotent either way.
       - name: Run daily pipeline
         run: ./run_daily.sh
-
-      - name: Save pipeline database
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: output/fleek.db
-          key: fleek-db-${{ github.run_id }}
 
       - name: Upload today's outreach queues
         uses: actions/upload-artifact@v4
