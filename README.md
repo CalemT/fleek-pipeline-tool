@@ -11,10 +11,11 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for how the pieces fit together,
 and [`AI_USAGE.md`](AI_USAGE.md) for how this was built. Two more worth
 reading for the full picture:
 
-- **[`DEBRIEF_PREP.md`](DEBRIEF_PREP.md)** - the detailed mechanics of how
-  scoring works, how the 40 daily Instagram DMs actually get picked (with
-  real numbers from running it), how this scales to 30,000 leads, and how
-  the two lead types are handled differently.
+- **[`GTM_STRATEGY.md`](GTM_STRATEGY.md)** - the commercial reasoning
+  behind the system: how scoring and prioritization actually work, how
+  the 40 daily Instagram DMs get picked (with real numbers from running
+  it), how this scales to 30,000 leads, and how the two lead types are
+  handled differently.
 - **[`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)** - a dated, honest record
   of every real bug found while building this, how it was found, and how
   it was fixed - including a production issue that only showed up after
@@ -59,6 +60,24 @@ python -m src.cli calibration
 #    weights instead of the reasoned starting weights (gated on a standard
 #    statistics threshold - won't do anything until there genuinely is enough)
 python -m src.cli recalibrate
+
+# 9. Decide which cities have enough visit-ready stores to justify a trip this week
+python -m src.cli visit-plan
+
+# 10. Recommend shifting capacity toward whichever channel is actually
+#     converting best, once real channel performance data exists
+python -m src.cli rebalance-caps
+
+# 11. Estimate days-to-clear the current backlog at today's caps - the real
+#     number behind "how do you scale without quality falling off"
+python -m src.cli backlog-forecast
+
+# 12. Write the JSON snapshot the GitHub Pages dashboard reads
+python -m src.cli export-dashboard
+
+# 13. If drafting logic changes mid-day, refresh text for anything still
+#     queued (not yet sent) so it reflects the latest wording
+python -m src.cli redraft
 ```
 
 ## Running this every morning, unattended
@@ -267,16 +286,32 @@ python tests/scale_test.py          # 30k-row synthetic load test
 
 ```
 src/
-  db.py        SQLite schema + connection
-  clean.py     field normalization (dates, phone, email, spend, stage, handle)
-  ingest.py    entity resolution / dedup-and-merge
-  classify.py  channel classification (direct vs instagram_dm)
-  scoring.py   prioritization tiers + cooldown
-  drafting.py  next-action decisioning + message templates
-  cli.py       ingest / plan / send / status commands
+  db.py            SQLite schema + connection
+  clean.py         field normalization (dates, phone, email, spend, stage, handle)
+  ingest.py        entity resolution / dedup-and-merge
+  classify.py      channel + lead-type + segment classification
+  scoring.py       prioritization tiers, Fit+Engagement scoring, cooldown
+  drafting.py      next-action decisioning + message templates
+  reply_intent.py  classifies a lead's reply (objection/question/etc) and
+                   drafts an actually-responsive follow-up, not a generic wrapper
+  config.py        loads config/assumptions.yaml - the seam for real Fleek data
+  cli.py           every command (ingest, plan, send, status, review-queue,
+                   calibration, recalibrate, rebalance-caps, backlog-forecast,
+                   visit-plan, export-dashboard, redraft, auto-ingest)
 tests/
-  test_clean.py, test_scoring.py     unit tests
-  scale_test.py                      30k-row synthetic load test
+  test_clean.py, test_scoring.py, test_classify.py,
+  test_config.py, test_reply_intent.py, test_redraft.py,
+  test_send_rotation.py             unit + integration tests
+  scale_test.py                     30k-row synthetic load test (run separately)
+docs/
+  index.html       the GitHub Pages dashboard
+  data/latest.json the daily snapshot it reads, written by export-dashboard
+config/
+  assumptions.yaml every capacity number and conversion-rate placeholder,
+                   in one place so Fleek can swap in real numbers later
 data/
-  pipeline_data.xlsx                 the provided case-study data
+  pipeline_data.xlsx   the provided case-study data
+  incoming/            where new lead-drop files land for auto-ingest
+.github/workflows/
+  daily_plan.yml   runs run_daily.sh on a schedule, fully unattended
 ```

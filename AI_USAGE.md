@@ -66,5 +66,6 @@ nearly every meaningful fix traces back to a specific, sometimes blunt
 question, not to AI self-correction. That's worth being honest about
 rather than dressing up as something more automatic than it was.
 
-See `DEVELOPMENT_LOG.md` for the complete trail, and `DEBRIEF_PREP.md`
-for how this connects directly to the debrief's three required questions.
+See `DEVELOPMENT_LOG.md` for the complete trail, and `GTM_STRATEGY.md`
+for the commercial reasoning behind how the system prioritizes, sequences,
+and scales outreach.

@@ -9,7 +9,7 @@ flowchart TD
 
     subgraph ING["Ingest - fully automatic"]
         direction TB
-        I1["Log raw row\n(raw_intake, audit trail)"] --> I2["Clean fields\n(dates, phone, email,\nspend, stage, handle)"]
+        I1["Log raw row\n(raw_intake, audit trail)"] --> I2["Clean fields\n(dates, phone via real E.164\nparsing, email, spend, stage, handle)"]
         I2 --> I3["Match against existing leads\nby email / phone / handle\n(in-memory index, not lead_id)"]
         I3 -->|match found| I4["Merge: most complete fields,\nmost advanced stage,\nlatest touch date"]
         I3 -->|no match| I5["New canonical lead"]
@@ -18,26 +18,33 @@ flowchart TD
     I4 --> LEADS[("leads table\n(SQLite, one row per real entity)")]
     I5 --> LEADS
 
-    LEADS --> CLS["Classify channel\ndirect (email/phone) vs\ninstagram_dm (handle only)"]
+    LEADS --> CLS["Classify:\nchannel (direct vs instagram_dm)\n+ lead_type + segment\n(New Reseller / Full-Time Reseller / Business)"]
 
     CLS --> PLAN
 
     subgraph PLAN["Plan - fully automatic, run every morning"]
         direction TB
-        P1["Score every active lead:\ntier (waiting-on-us > new >\nfollow-up-due > re-engage)\n+ value (est. monthly spend)"]
+        P1["Score every active lead:\ntier (waiting-on-us > new >\nfollow-up-due > re-engage)\n+ Fit/Engagement (config-driven weights)"]
         P2["Apply cooldown:\nskip anyone messaged too\nrecently for their stage"]
-        P3["Cap Instagram queue at ~40/day,\ntake top-scored first"]
-        P4["No cap on stores;\ngroup by city for visit planning"]
-        P5["Draft the actual message\nper lead (DM / email / call / visit)"]
-        P1 --> P2 --> P3 --> P4 --> P5
+        P3["Cap each channel separately:\nInstagram 40/day (platform limit),\nemail/call/visit (config/assumptions.yaml)"]
+        P4["Draft the message:\nsegment-aware cold opens;\nreply_intent classifies their last\nreply (objection/question/etc) and\ndrafts an actually-responsive follow-up"]
+        P1 --> P2 --> P3 --> P4
     end
 
+    PLAN --> VISIT["visit-plan:\nwhich cities have enough\nvisit-ready stores to justify\na trip this week (config threshold)"]
+
     PLAN --> LOG[("actions_log\n(what was queued, when, status)")]
-    LOG --> CSV1["outreach_instagram_DATE.csv"]
-    LOG --> CSV2["outreach_stores_DATE.csv"]
+    VISIT --> LOG
+
+    LOG --> REDRAFT["redraft:\nrefreshes text for anything still\n'queued' if drafting logic changed,\nnever touches anything already 'sent'"]
+    REDRAFT --> CSV1["outreach_instagram_DATE.csv"]
+    REDRAFT --> CSV2["outreach_stores_DATE.csv"]
+    REDRAFT --> CSV3["visit_plan.csv"]
+    REDRAFT --> DASH["docs/data/latest.json\n-> GitHub Pages dashboard\n(clickable, not just a CSV)"]
 
     CSV1 --> HUMAN["Human (or DM-sending agent)\nactually sends the message"]
     CSV2 --> HUMAN
+    DASH --> HUMAN
 
     HUMAN -->|send command| SENT["Mark sent:\nadvances last_touch_date,\nstarts next cooldown window"]
     SENT --> LEADS
@@ -49,7 +56,9 @@ flowchart TD
 |---|---|---|
 | Cleaning, dedup, classification | Yes - runs on every ingest | |
 | Deciding who gets today's 40 DMs | Yes - deterministic, re-derivable | |
-| Drafting the message | Yes - template + lead data | A person should skim before sending; tone matters more than the bones |
+| Drafting the message | Yes - segment-aware, and content-aware via `reply_intent` (responds to whether the lead's last message was an objection, a question, or genuine interest - not a generic wrapper) | A person should skim before sending; tone matters more than the bones |
+| Deciding which cities are worth a dedicated visit trip | Yes - `visit-plan`, config-driven threshold | |
+| Publishing a clickable view of all of the above | Yes - `export-dashboard` -> GitHub Pages | |
 | Actually sending the DM / email / making the call / visiting the shop | | Yes today. This is exactly where an Instagram-sending agent or an outbound email API would plug in next - the `send` command is already the seam for it |
 | Reviewing flagged data-quality issues (malformed emails, etc.) | Flagged automatically (`data_quality_flags`) | A person resolves the actual contact detail |
 
@@ -61,11 +70,12 @@ paced and somewhat manual anyway.
 ## Why it holds up at 30,000 leads
 
 - **Entity matching is O(1) per row**, not O(n). `ingest.py`'s `MatchIndex`
-  builds an in-memory `email -> lead_key`, `phone_key -> lead_key`,
-  `handle -> lead_key` dict once at the start of an ingest run, instead of
-  running a `SELECT` against the (growing) `leads` table for every single
-  incoming row. That's the difference between linear and quadratic ingest
-  time, and it's the actual bottleneck this case study is testing for -
+  builds an in-memory `email -> lead_key`, `phone -> lead_key` (exact
+  E.164 string, via real parsing - see below), `handle -> lead_key` dict
+  once at the start of an ingest run, instead of running a `SELECT`
+  against the (growing) `leads` table for every single incoming row.
+  That's the difference between linear and quadratic ingest time, and
+  it's the actual bottleneck this case study is testing for -
   `tests/scale_test.py` ingests 30,000 synthetic rows in ~9-10 seconds
   on a single core.
 - **Writes are batched** (`executemany` + `INSERT ... ON CONFLICT`) instead
@@ -85,8 +95,8 @@ paced and somewhat manual anyway.
   surfaces that distinction.** The code handles 30,000 leads fine. Whether
   the *business* can actually work through them is a different question -
   at 30k, the Instagram backlog alone would take ~341 days to clear at the
-  platform's fixed 40/day cap. See README for what this means for the
-  "scaling" debrief question.
+  platform's fixed 40/day cap. See `GTM_STRATEGY.md` for what this means
+  for scaling the operation, not just the code.
 - **What would change next**, beyond 30k: swap SQLite for Postgres (same
   SQL, just a different connection string - nothing here is SQLite-specific
   syntax beyond `ON CONFLICT`, which Postgres also supports); move the

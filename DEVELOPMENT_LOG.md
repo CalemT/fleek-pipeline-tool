@@ -3,9 +3,9 @@
 A dated, honest record of how this was actually built: every real issue
 found, who/what surfaced it, how it was investigated, and how it was
 fixed and verified. This isn't a polished summary written after the fact -
-it's a reconstruction of the real working process, including the mistakes,
-because that process is exactly what the brief asks candidates to show
-("show us the thinking, not just the tool").
+it's a reconstruction of the real working process, including the
+mistakes, because that process is the actual substance of how the system
+got to its current state, not just the final code.
 
 The short version: most of the genuinely important fixes in this repo
 exist because of a direct, specific question or a refusal to accept "it
@@ -40,7 +40,7 @@ actually true, and explicitly said not to be agreeable about it.
 |---|---|---|---|
 | 2.1 | "Is this the best tool possible? Have we covered every base?" | Re-ran the entire test suite and a fresh scale test rather than answering from memory | Found the full `plan` command (not just ingest) had never actually been timed at 30k scale |
 | 2.2 | (found while answering 2.1) | Timed the full `plan` command at 30k | 0.6s - fine, but this was previously an *assumption*, not a measured fact |
-| 2.3 | "Is there anything further we can optimise?" | Simulated 15 consecutive days of `plan`+`send` at 30k scale to check for degradation over time, not just on day one | Flat performance confirmed; also surfaced the ~341-day Instagram backlog number used throughout `DEBRIEF_PREP.md` |
+| 2.3 | "Is there anything further we can optimise?" | Simulated 15 consecutive days of `plan`+`send` at 30k scale to check for degradation over time, not just on day one | Flat performance confirmed; also surfaced the ~341-day Instagram backlog number used throughout `GTM_STRATEGY.md` |
 | 2.4 | (found while answering 2.3) | A lead that reached `new` tier and was sent to once never advanced - tier never changed | **Real bug**: `send()` updated touch count but never advanced stage from `new`, so the same top-scored leads would win every single day forever, permanently starving the rest of the queue | Fixed: `send()` now advances `new` -> `contacted`. Added a regression test that proves rotation actually happens over multiple days, not just that a cap exists |
 
 ---
@@ -156,12 +156,11 @@ showed the old, broken reply text.
 
 ## What this log is for
 
-Anyone - a future engineer, an interviewer, Fleek's team - should be able
-to read this top to bottom and see exactly which decisions were
-deliberate engineering choices versus real mistakes that got caught and
-fixed, and *how* each was caught. Almost none of the entries marked "found
-while testing" or "found by the user" were things the build process
-surfaced on its own - they came from someone refusing to accept "this
-should work" as good enough, and checking the real, live result instead.
-That's the part of this process worth being honest about, not just the
-finished commit history.
+Anyone reading this top to bottom should be able to see exactly which
+decisions were deliberate engineering choices versus real mistakes that
+got caught and fixed, and *how* each was caught. Almost none of the
+entries marked "found while testing" or "found by the user" were things
+the build process surfaced on its own - they came from someone refusing
+to accept "this should work" as good enough, and checking the real, live
+result instead. That's the part of this process worth being honest about,
+not just the finished commit history.
