@@ -59,7 +59,7 @@ def test_draft_message_never_calls_a_reseller_a_shop():
     # not generic store language that's wrong for who they actually are.
     from src import drafting
     lead = {"contact_name": "Marcus", "store_name": None, "handle": "staticvintage",
-            "active_listings": None, "sales_velocity_30d": None,
+            "active_listings": None, "sales_velocity_30d": None, "lead_key": "lead:T1",
             "last_inbound_text": None, "city": None, "segment": "full_time_reseller"}
     msg = drafting.draft_message(lead, "email_followup")
     assert "your shop" not in msg
@@ -80,7 +80,7 @@ def test_dm_cold_fallback_never_calls_an_instagram_reseller_a_shop():
 
 def test_draft_message_falls_back_to_neutral_when_no_identifier_at_all():
     from src import drafting
-    lead = {"contact_name": None, "store_name": None, "handle": None,
+    lead = {"contact_name": None, "store_name": None, "handle": None, "lead_key": "lead:T2",
             "active_listings": None, "sales_velocity_30d": None,
             "last_inbound_text": None, "city": None, "segment": None}
     msg = drafting.draft_message(lead, "email_followup")

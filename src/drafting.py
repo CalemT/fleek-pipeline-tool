@@ -11,6 +11,7 @@ full_time_reseller / business - see classify.py) - a beginner testing their
 first bundle and a full-time reseller doing 200 sales/month don't want the
 same pitch, and joinfleek.com itself markets to them differently.
 """
+from . import reply_intent
 
 FIRST_NAME_FALLBACK_STORE = "there"
 
@@ -102,10 +103,7 @@ def draft_message(lead, action_type: str) -> str:
                 f"so resellers don't have to source piece-by-piece - {hook}. Worth a quick chat?")
 
     if action_type == "dm_followup":
-        if last_text:
-            return (f"Thanks for the reply - re \"{last_text}\": happy to talk through that. "
-                     f"What's a good time this week for a quick call?")
-        return "Following up on this - still keen to chat? Happy to work around your schedule."
+        return reply_intent.reply_for(lead["lead_key"], last_text)
 
     if action_type == "dm_reengage":
         return ("Hey, know it's been quiet - happy to get you set up with a bulk batch "
@@ -119,10 +117,9 @@ def draft_message(lead, action_type: str) -> str:
                 f"short call this week to see if it's a fit?\n\nBest,\nFleek")
 
     if action_type == "email_followup":
-        ref = f' You mentioned: "{last_text}".' if last_text else ""
+        body = reply_intent.reply_for(lead["lead_key"], last_text)
         return (f"Subject: Re: wholesale supply for {place}\n\n"
-                f"Hi {name},\n\nFollowing up on our last chat.{ref} Keen to find a time this "
-                f"week to move things forward - does a quick call work?\n\nBest,\nFleek")
+                f"Hi {name},\n\n{body}\n\nBest,\nFleek")
 
     if action_type == "call":
         ref = f' Last note from them: "{last_text}".' if last_text else ""

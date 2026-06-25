@@ -110,6 +110,34 @@ everything else, no download required):
 3. The daily workflow already commits a fresh `docs/data/latest.json` every
    run, so the page reflects today's actual output without any extra step
 
+## Drafted replies actually respond to what was said
+
+Earlier versions of the follow-up templates quoted the lead's last message
+back inside a fixed wrapper sentence ("You mentioned: 'X'. Keen to find a
+time...") regardless of what X actually said - so "Not taking on new
+channels currently" and "What's the fee structure?" got the identical
+generic push for a call. `src/reply_intent.py` fixes this with a small,
+rule-based classifier grounded in real objection-handling practice:
+objections (a decline) get acknowledged with no pressure and a low-friction
+next step; genuine questions (pricing, logistics) get actually answered
+without fabricating numbers we don't have; positive signals move straight
+to booking a time. Verified against every one of the 25 real replies that
+actually appear in the case-study data (`tests/test_reply_intent.py`), not
+hypothetical examples - and a real classification bug was caught in the
+process: "not interested" was initially misread as positive sentiment
+because "interested" is a substring of it, ignoring the negation.
+
+Each bucket also has multiple phrasings, chosen deterministically per lead
+rather than one fixed sentence reused everywhere - identical phrasing
+across messages is itself a documented signal of AI-generated text, so
+variety isn't cosmetic here. This is a deliberately simple, explainable,
+zero-cost rule-based classifier, not an LLM call - a real, named scope
+boundary: it handles every reply actually seen in the data, but genuinely
+novel phrasing outside these categories falls back to a general (still
+improved) reply rather than guessing. Routing unclassified replies through
+an actual LLM call, grounded in the same research, is the natural next
+upgrade once messages need to handle truly open-ended replies.
+
 ## Will this actually keep up at scale?
 
 `python -m src.cli backlog-forecast` answers this directly instead of
