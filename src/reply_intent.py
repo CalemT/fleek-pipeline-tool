@@ -28,6 +28,11 @@ this needs to handle truly open-ended replies, is routing unclassified
 text through an actual LLM call grounded in the same research - that's a
 deliberate scope boundary for this build, not an oversight.
 """
+
+# Compatibility: Python 3.9 does not support `X | None` type-hint syntax
+# at runtime (that needs 3.10+). This defers annotation evaluation so the
+# same code runs on 3.9-3.12+ without changing any actual logic.
+from __future__ import annotations
 import hashlib
 
 # Order matters: checked top-to-bottom, first match wins. Specific

@@ -25,6 +25,11 @@ Worth recalibrating against real data the same way scoring is, once segment
 correlates with anything measurable.
 """
 
+# Compatibility: Python 3.9 does not support `X | None` type-hint syntax
+# at runtime (that needs 3.10+). This defers annotation evaluation so the
+# same code runs on 3.9-3.12+ without changing any actual logic.
+from __future__ import annotations
+
 NEW_RESELLER_LISTINGS_CAP = 50
 NEW_RESELLER_VELOCITY_CAP = 20
 

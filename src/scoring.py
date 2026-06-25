@@ -33,6 +33,11 @@ roughly 10+ outcome examples per input feature; with ~7 features here that's
 threshold honestly every time it's run, and only ever *recommends* new
 weights for a human to review - it never silently rewrites this file.
 """
+
+# Compatibility: Python 3.9 does not support `X | None` type-hint syntax
+# at runtime (that needs 3.10+). This defers annotation evaluation so the
+# same code runs on 3.9-3.12+ without changing any actual logic.
+from __future__ import annotations
 from datetime import date, datetime
 
 WAITING_ON_US = {"replied", "warm", "negotiating", "call_booked"}
