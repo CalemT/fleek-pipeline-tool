@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T19:56:08.746323+00:00",
+  "generated_at": "2026-06-25T20:09:56.598150+00:00",
   "date": "2026-06-25",
   "instagram": [
     {
@@ -6838,92 +6838,5 @@
     "call": 30,
     "visit": 5
   },
-  "import_history": [
-    {
-      "batch_label": "day2",
-      "ingested_at": "2026-06-25T19:56:06.301428+00:00",
-      "rows_seen": 30,
-      "new_leads": 28,
-      "merged_leads": 2,
-      "merged_lead_details": [
-        {
-          "name": "heritagefinds",
-          "source_lead_ids": "L0130,L0295"
-        },
-        {
-          "name": "driftarchive",
-          "source_lead_ids": "L0073,L0294"
-        }
-      ]
-    },
-    {
-      "batch_label": "initial_handover",
-      "ingested_at": "2026-06-25T19:56:05.578149+00:00",
-      "rows_seen": 265,
-      "new_leads": 250,
-      "merged_leads": 15,
-      "merged_lead_details": [
-        {
-          "name": "Second Threads",
-          "source_lead_ids": "L0152,L0258"
-        },
-        {
-          "name": "marrowgrail_uk",
-          "source_lead_ids": "L0003,L0251"
-        },
-        {
-          "name": "embermarrowco",
-          "source_lead_ids": "L0061,L0265"
-        },
-        {
-          "name": "Velvet Trunk",
-          "source_lead_ids": "L0165,L0255"
-        },
-        {
-          "name": "sableshop",
-          "source_lead_ids": "L0015,L0263"
-        },
-        {
-          "name": "emberco",
-          "source_lead_ids": "L0115,L0264"
-        },
-        {
-          "name": "Past Cellar",
-          "source_lead_ids": "L0224,L0254"
-        },
-        {
-          "name": "emberfadedsupply",
-          "source_lead_ids": "L0002,L0261"
-        },
-        {
-          "name": "Vintage Closet",
-          "source_lead_ids": "L0240,L0260"
-        },
-        {
-          "name": "Past Lane",
-          "source_lead_ids": "L0151,L0259"
-        },
-        {
-          "name": "Rusty Wardrobe",
-          "source_lead_ids": "L0188,L0252"
-        },
-        {
-          "name": "Rusty Cellar",
-          "source_lead_ids": "L0176,L0256"
-        },
-        {
-          "name": "giltgiltgallery",
-          "source_lead_ids": "L0120,L0253"
-        },
-        {
-          "name": "reworkedstaticfinds",
-          "source_lead_ids": "L0021,L0262"
-        },
-        {
-          "name": "tonicfadedstudio",
-          "source_lead_ids": "L0080,L0257"
-        }
-      ]
-    }
-  ]
+  "import_history": []
 }
