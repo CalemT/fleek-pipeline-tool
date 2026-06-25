@@ -92,6 +92,24 @@ a store stuck in `follow_up_due` could be called indefinitely and never
 escalate, which contradicted the brief's literal sequence for *any*
 unresponsive store. Both tiers now share one ladder, keyed on touch count.
 
+## A clickable viewer, not just CSVs
+
+The brief's in-person stage talks about clicking into individual leads -
+a flat CSV doesn't really support that. `docs/index.html` is a small,
+dependency-free dashboard that reads `docs/data/latest.json` (written by
+`python -m src.cli export-dashboard`, wired into the daily run) and lets
+you click into any lead to see its full picture: score, stage, segment,
+the actual drafted message, and the last thing they said to us. Visit plan
+gets its own tab showing which cities are flagged trip-worthy.
+
+To make it live on GitHub Pages (so it updates every morning along with
+everything else, no download required):
+1. Repo **Settings** → **Pages** → under "Build and deployment," set
+   **Source** to "Deploy from a branch," branch **main**, folder **/docs**
+2. Save - GitHub gives you a URL like `https://<username>.github.io/<repo>/`
+3. The daily workflow already commits a fresh `docs/data/latest.json` every
+   run, so the page reflects today's actual output without any extra step
+
 ## Will this actually keep up at scale?
 
 `python -m src.cli backlog-forecast` answers this directly instead of

@@ -15,6 +15,7 @@ touching what's already in the pipeline.
 """
 import argparse
 import csv
+import json
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -589,6 +590,118 @@ def cmd_visit_plan(args):
     conn.close()
 
 
+def cmd_export_dashboard(args):
+    """Builds docs/data/latest.json - the one file the GitHub Pages
+    dashboard reads. Same underlying query as the CSV exports, just shaped
+    for a clickable viewer instead of a spreadsheet, since the brief's
+    in-person stage talks about clicking into individual leads, which a
+    flat CSV doesn't really support."""
+    today = date.today()
+    today_iso = today.isoformat()
+    conn = db.connect(args.db)
+
+    def rows_for(channel):
+        leads = conn.execute(
+            "SELECT * FROM leads WHERE channel=? AND stage NOT IN ('won','lost')", (channel,)
+        ).fetchall()
+        out = []
+        for lead in leads:
+            tier, score = scoring.score_lead(lead, today)
+            if tier is None:
+                continue
+            action_row = conn.execute(
+                "SELECT action_type, message_draft, status FROM actions_log "
+                "WHERE lead_key=? AND action_date=? ORDER BY id DESC LIMIT 1",
+                (lead["lead_key"], today_iso),
+            ).fetchone()
+            out.append({
+                "lead_key": lead["lead_key"],
+                "handle": lead["handle"],
+                "store_name": lead["store_name"],
+                "contact_name": lead["contact_name"],
+                "email": lead["email"],
+                "phone": lead["phone"],
+                "city": lead["city"],
+                "stage": lead["stage"],
+                "segment": lead["segment"],
+                "tier": tier,
+                "score": round(score, 1),
+                "est_monthly_spend_gbp": lead["est_monthly_spend_gbp"],
+                "followers": lead["followers"],
+                "active_listings": lead["active_listings"],
+                "sales_velocity_30d": lead["sales_velocity_30d"],
+                "num_touches": lead["num_touches"],
+                "last_inbound_text": lead["last_inbound_text"],
+                "notes": lead["notes"],
+                "action_type": action_row["action_type"] if action_row else None,
+                "message_draft": action_row["message_draft"] if action_row else None,
+                "queued_today": bool(action_row),
+            })
+        out.sort(key=lambda r: -r["score"])
+        return out
+
+    instagram = rows_for("instagram_dm")
+    stores = rows_for("direct")
+
+    min_cluster = cfg.load_config()["min_visit_cluster"]
+    # Visit-readiness for clustering must be computed the same way
+    # cmd_visit_plan computes it - directly from next_action_type on every
+    # eligible lead - not from which leads happened to get an actual queued
+    # action today. The daily visit cap (5/day) means most visit-eligible
+    # leads never get logged as an action on any given day, so filtering on
+    # "action_type == visit" here was silently looking at capped demand
+    # instead of true demand - caught by actually executing this against
+    # real exported data and noticing the two commands disagreed.
+    visit_ready = []
+    for lead in conn.execute(
+        "SELECT * FROM leads WHERE channel='direct' AND stage NOT IN ('won','lost')"
+    ).fetchall():
+        tier, score = scoring.score_lead(lead, today)
+        if tier is None:
+            continue
+        if drafting.next_action_type(lead, tier) != "visit":
+            continue
+        action_row = conn.execute(
+            "SELECT action_type, message_draft, status FROM actions_log "
+            "WHERE lead_key=? AND action_date=? ORDER BY id DESC LIMIT 1",
+            (lead["lead_key"], today_iso),
+        ).fetchone()
+        visit_ready.append({
+            "lead_key": lead["lead_key"], "store_name": lead["store_name"],
+            "contact_name": lead["contact_name"], "email": lead["email"],
+            "phone": lead["phone"], "city": lead["city"], "stage": lead["stage"],
+            "segment": lead["segment"], "tier": tier, "score": round(score, 1),
+            "num_touches": lead["num_touches"], "last_inbound_text": lead["last_inbound_text"],
+            "action_type": "visit",
+            "message_draft": action_row["message_draft"] if action_row else None,
+            "queued_today": bool(action_row),
+        })
+
+    by_city = {}
+    for r in visit_ready:
+        by_city.setdefault(r["city"] or "(unknown)", []).append(r)
+    visit_plan = [
+        {"city": city, "trip_worthy": len(rows_) >= min_cluster, "leads": rows_}
+        for city, rows_ in sorted(by_city.items(), key=lambda kv: -len(kv[1]))
+    ]
+
+    snapshot = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "date": today_iso,
+        "instagram": instagram,
+        "stores": stores,
+        "visit_plan": visit_plan,
+        "caps": cfg.load_config()["daily_caps"],
+    }
+
+    docs_dir = Path("docs/data")
+    docs_dir.mkdir(parents=True, exist_ok=True)
+    path = docs_dir / "latest.json"
+    path.write_text(json.dumps(snapshot, indent=2, default=str))
+    print(f"[export-dashboard] {len(instagram)} Instagram, {len(stores)} store leads -> {path}")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -648,6 +761,9 @@ def main():
 
     p_visit = sub.add_parser("visit-plan", help="Decide which cities have enough visit-ready stores for a dedicated trip")
     p_visit.set_defaults(func=cmd_visit_plan)
+
+    p_export = sub.add_parser("export-dashboard", help="Write docs/data/latest.json for the GitHub Pages viewer")
+    p_export.set_defaults(func=cmd_export_dashboard)
 
     args = p.parse_args()
     args.func(args)

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleek Outreach Manifest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ECE6D9;
+    --surface: #FBF9F4;
+    --surface-raised: #FFFFFF;
+    --ink: #262119;
+    --ink-soft: #6B6256;
+    --denim: #38516B;
+    --denim-soft: #5B7591;
+    --olive: #5C7A52;
+    --rust: #A8502E;
+    --line: #D9D1C0;
+    --radius: 3px;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --stencil: 'Oswald', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  a { color: var(--denim); }
+  :focus-visible { outline: 2px solid var(--denim); outline-offset: 2px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* ---- header / manifest stamp ---- */
+  header.manifest {
+    border: 1px solid var(--line);
+    background:
+      repeating-linear-gradient(135deg, rgba(38,33,25,0.025) 0 2px, transparent 2px 10px),
+      var(--surface);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+  }
+  .manifest-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .manifest-title {
+    font-family: var(--stencil);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 22px;
+    margin: 0;
+  }
+  .manifest-sub {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 4px 0 0;
+  }
+  .stamp {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .stamp strong { color: var(--ink); display: block; font-size: 12.5px; }
+
+  .stat-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .stat-tag {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    background: var(--surface-raised);
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .stat-tag b { font-family: var(--stencil); font-size: 16px; font-weight: 600; color: var(--denim); }
+
+  /* ---- tabs ---- */
+  nav.tabs {
+    display: flex; gap: 2px; margin-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  nav.tabs button {
+    font-family: var(--stencil);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 13px;
+    font-weight: 600;
+    background: none; border: none;
+    color: var(--ink-soft);
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  nav.tabs button[aria-selected="true"] {
+    color: var(--ink);
+    border-bottom-color: var(--denim);
+  }
+  nav.tabs button:hover { color: var(--ink); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .empty {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 30px 10px;
+    text-align: center;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+  }
+
+  /* ---- city groups (visit plan) ---- */
+  .city-group {
+    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .city-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px;
+    background: var(--surface);
+    font-family: var(--stencil);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: 13.5px;
+  }
+  .city-head.worthy { border-left: 4px solid var(--olive); }
+  .city-head.notyet { border-left: 4px solid var(--ink-soft); opacity: 0.85; }
+  .city-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: var(--radius);
+  }
+  .city-badge.worthy { background: rgba(92,122,82,0.15); color: var(--olive); }
+  .city-badge.notyet { background: rgba(107,98,86,0.15); color: var(--ink-soft); }
+
+  /* ---- lead rows ---- */
+  ul.leads { list-style: none; margin: 0; padding: 0; }
+  li.lead { border-top: 1px solid var(--line); }
+  li.lead:first-child { border-top: none; }
+
+  .lead-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    cursor: pointer;
+    background: var(--surface-raised);
+    width: 100%;
+    border: none;
+    text-align: left;
+    font: inherit;
+  }
+  .lead-row:hover { background: var(--surface); }
+
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    flex: none;
+    box-shadow: 0 0 0 2px var(--surface-raised);
+  }
+  .dot.waiting_on_us { background: var(--olive); }
+  .dot.new { background: var(--denim-soft); }
+  .dot.follow_up_due { background: #C2A23B; }
+  .dot.re_engage { background: var(--rust); }
+
+  .lead-name { font-weight: 500; flex: 1; min-width: 0; }
+  .lead-name .sub { display: block; font-size: 12px; color: var(--ink-soft); font-weight: 400; }
+
+  .lead-meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .lead-score {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    min-width: 52px;
+    text-align: right;
+  }
+  .chev { color: var(--ink-soft); transition: transform 0.15s ease; flex: none; }
+  .lead-row[aria-expanded="true"] .chev { transform: rotate(90deg); }
+
+  .lead-detail {
+    display: none;
+    padding: 4px 14px 16px 35px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .lead-detail.open { display: block; }
+  .detail-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px 18px; margin: 12px 0;
+    font-size: 12.5px;
+  }
+  .detail-grid dt { font-family: var(--mono); color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .detail-grid dd { margin: 2px 0 0; }
+  .draft-box {
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--denim);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    margin-top: 8px;
+  }
+  .draft-label {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--ink-soft); margin-bottom: 4px;
+  }
+  .inbound {
+    font-style: italic; color: var(--ink-soft); font-size: 12.5px;
+    border-left: 2px solid var(--line); padding-left: 8px; margin: 6px 0;
+  }
+
+  .queued-flag {
+    font-family: var(--mono); font-size: 10.5px;
+    padding: 2px 6px; border-radius: var(--radius);
+    background: rgba(56,81,107,0.12); color: var(--denim);
+    flex: none;
+  }
+
+  footer {
+    text-align: center; font-family: var(--mono); font-size: 11.5px;
+    color: var(--ink-soft); margin-top: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .manifest-top { flex-direction: column; }
+    .stamp { text-align: left; }
+    .lead-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="manifest">
+    <div class="manifest-top">
+      <div>
+        <h1 class="manifest-title">Fleek &middot; Outreach Manifest</h1>
+        <p class="manifest-sub" id="dateLine">Loading&hellip;</p>
+      </div>
+      <div class="stamp">
+        <span>LAST RUN</span>
+        <strong id="timestampLine">&mdash;</strong>
+      </div>
+    </div>
+    <div class="stat-row" id="statRow"></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-panel="instagram">Instagram DMs</button>
+    <button role="tab" aria-selected="false" data-panel="stores">Store Outreach</button>
+    <button role="tab" aria-selected="false" data-panel="visits">Visit Plan</button>
+  </nav>
+
+  <section class="panel active" id="panel-instagram"></section>
+  <section class="panel" id="panel-stores"></section>
+  <section class="panel" id="panel-visits"></section>
+
+  <footer>Generated automatically by the daily pipeline run &middot; see the repo README for how this works</footer>
+</div>
+
+<script>
+const TIER_LABEL = {
+  waiting_on_us: 'Waiting on us',
+  new: 'New',
+  follow_up_due: 'Follow-up due',
+  re_engage: 'Re-engage',
+};
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtMoney(v) {
+  if (v === null || v === undefined) return '&mdash;';
+  return '£' + Number(v).toLocaleString();
+}
+
+function leadRow(lead, idx, prefix) {
+  const id = `${prefix}-${idx}`;
+  const name = lead.store_name || lead.handle || lead.contact_name || '(unnamed)';
+  const sub = lead.store_name && lead.handle ? '@' + lead.handle
+            : lead.city ? lead.city : '';
+  const queuedBadge = lead.queued_today ? `<span class="queued-flag">QUEUED TODAY</span>` : '';
+
+  return `
+    <li class="lead">
+      <button class="lead-row" aria-expanded="false" aria-controls="${id}" onclick="toggleLead('${id}')">
+        <span class="dot ${lead.tier}" title="${TIER_LABEL[lead.tier] || lead.tier}"></span>
+        <span class="lead-name">${escapeHtml(name)}${sub ? `<span class="sub">${escapeHtml(sub)}</span>` : ''}</span>
+        ${queuedBadge}
+        <span class="lead-meta">${TIER_LABEL[lead.tier] || lead.tier} &middot; ${escapeHtml(lead.action_type || '')}</span>
+        <span class="lead-score">${lead.score}</span>
+        <span class="chev">&#10095;</span>
+      </button>
+      <div class="lead-detail" id="${id}">
+        <dl class="detail-grid">
+          <div><dt>Stage</dt><dd>${escapeHtml(lead.stage)}</dd></div>
+          <div><dt>Segment</dt><dd>${escapeHtml(lead.segment)}</dd></div>
+          <div><dt>Est. spend</dt><dd>${fmtMoney(lead.est_monthly_spend_gbp)}/mo</dd></div>
+          <div><dt>Touches</dt><dd>${lead.num_touches ?? 0}</dd></div>
+          ${lead.followers ? `<div><dt>Followers</dt><dd>${Number(lead.followers).toLocaleString()}</dd></div>` : ''}
+          ${lead.active_listings ? `<div><dt>Listings</dt><dd>${lead.active_listings}</dd></div>` : ''}
+          ${lead.email ? `<div><dt>Email</dt><dd>${escapeHtml(lead.email)}</dd></div>` : ''}
+          ${lead.phone ? `<div><dt>Phone</dt><dd>${escapeHtml(lead.phone)}</dd></div>` : ''}
+        </dl>
+        ${lead.last_inbound_text ? `<p class="inbound">&ldquo;${escapeHtml(lead.last_inbound_text)}&rdquo;</p>` : ''}
+        ${lead.message_draft ? `
+          <div class="draft-label">Drafted ${escapeHtml(lead.action_type)}</div>
+          <div class="draft-box">${escapeHtml(lead.message_draft)}</div>
+        ` : '<p class="inbound">No action drafted today.</p>'}
+      </div>
+    </li>`;
+}
+
+function toggleLead(id) {
+  const detail = document.getElementById(id);
+  const btn = document.querySelector(`[aria-controls="${id}"]`);
+  const open = detail.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function renderList(leads, prefix) {
+  if (!leads.length) return '<p class="empty">Nothing in this queue right now.</p>';
+  return `<ul class="leads">${leads.map((l, i) => leadRow(l, i, prefix)).join('')}</ul>`;
+}
+
+function renderVisitPlan(visitPlan) {
+  if (!visitPlan.length) return '<p class="empty">No stores have reached visit-ready status yet.</p>';
+  return visitPlan.map((group, gi) => `
+    <div class="city-group">
+      <div class="city-head ${group.trip_worthy ? 'worthy' : 'notyet'}">
+        <span>${escapeHtml(group.city)} &middot; ${group.leads.length} store${group.leads.length === 1 ? '' : 's'}</span>
+        <span class="city-badge ${group.trip_worthy ? 'worthy' : 'notyet'}">${group.trip_worthy ? 'BOOK THIS WEEK' : 'NOT YET'}</span>
+      </div>
+      ${renderList(group.leads, `v${gi}`)}
+    </div>
+  `).join('');
+}
+
+function setupTabs() {
+  const buttons = document.querySelectorAll('nav.tabs button');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.setAttribute('aria-selected', 'false'));
+      btn.setAttribute('aria-selected', 'true');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    });
+  });
+}
+
+async function init() {
+  setupTabs();
+  let data;
+  try {
+    const res = await fetch('data/latest.json', { cache: 'no-store' });
+    data = await res.json();
+  } catch (e) {
+    document.getElementById('dateLine').textContent = 'Could not load data/latest.json';
+    return;
+  }
+
+  document.getElementById('dateLine').textContent = `Outreach plan for ${data.date}`;
+  const ts = new Date(data.generated_at);
+  document.getElementById('timestampLine').textContent = ts.toUTCString().replace(' GMT', ' UTC');
+
+  const dmQueued = data.instagram.filter(l => l.queued_today).length;
+  const tripWorthyCities = data.visit_plan.filter(g => g.trip_worthy).length;
+  document.getElementById('statRow').innerHTML = `
+    <span class="stat-tag"><b>${dmQueued}/${data.caps.instagram_dm}</b> Instagram DMs today</span>
+    <span class="stat-tag"><b>${data.stores.filter(l => l.queued_today).length}</b> store actions today</span>
+    <span class="stat-tag"><b>${tripWorthyCities}</b> ${tripWorthyCities === 1 ? 'city' : 'cities'} worth visiting this week</span>
+  `;
+
+  document.getElementById('panel-instagram').innerHTML = renderList(data.instagram, 'ig');
+  document.getElementById('panel-stores').innerHTML = renderList(data.stores, 'st');
+  document.getElementById('panel-visits').innerHTML = renderVisitPlan(data.visit_plan);
+}
+
+init();
+</script>
+</body>
+</html>
