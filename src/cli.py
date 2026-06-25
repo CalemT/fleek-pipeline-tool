@@ -703,6 +703,45 @@ def cmd_export_dashboard(args):
     conn.close()
 
 
+def cmd_redraft(args):
+    """Re-generates message_draft text for anything still status='queued'
+    today, using the CURRENT drafting logic - without changing which leads
+    were selected or touching anything already marked 'sent' for real.
+
+    This exists because of a real edge case: once a message is drafted for
+    a lead on a given day, it's intentionally locked in so the tool never
+    re-drafts or double-sends within the same day (the whole point of the
+    no-double-messaging guarantee). But that means if the drafting logic
+    itself changes mid-day (a template gets fixed, like reply_intent did),
+    anything already queued before the fix keeps showing the OLD text,
+    because the tool correctly thinks 'already queued today' and skips
+    regenerating it - it just doesn't know *why* it shouldn't. This command
+    is the explicit, safe way to catch those up without breaking the
+    guarantee that something already sent never silently changes after
+    the fact."""
+    today_iso = date.today().isoformat()
+    conn = db.connect(args.db)
+    rows = conn.execute(
+        "SELECT * FROM actions_log WHERE action_date=? AND status='queued'", (today_iso,)
+    ).fetchall()
+
+    updated = 0
+    for row in rows:
+        lead = conn.execute("SELECT * FROM leads WHERE lead_key=?", (row["lead_key"],)).fetchone()
+        if not lead:
+            continue
+        new_draft = drafting.draft_message(lead, row["action_type"])
+        if new_draft != row["message_draft"]:
+            conn.execute(
+                "UPDATE actions_log SET message_draft=? WHERE id=?", (new_draft, row["id"])
+            )
+            updated += 1
+    conn.commit()
+    print(f"[redraft] checked {len(rows)} queued-but-unsent actions for {today_iso}, "
+          f"updated {updated} with current drafting logic")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -765,6 +804,9 @@ def main():
 
     p_export = sub.add_parser("export-dashboard", help="Write docs/data/latest.json for the GitHub Pages viewer")
     p_export.set_defaults(func=cmd_export_dashboard)
+
+    p_redraft = sub.add_parser("redraft", help="Refresh message text for queued-but-unsent actions using current code")
+    p_redraft.set_defaults(func=cmd_redraft)
 
     args = p.parse_args()
     args.func(args)
