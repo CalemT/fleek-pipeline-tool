@@ -85,18 +85,54 @@ multi-day rotation simulation, the GitHub Actions live verification, and
 the backlog-forecast numbers that ended up driving the scaling reasoning
 in `GTM_STRATEGY.md`.
 
+**7. Even after being told the project was essentially finished - twice -
+that was rejected, and it found two more real, would-have-shipped bugs.**
+Asked directly "why would we not turn this into GitHub Issues instead of
+a CSV" led to building a GitHub Issues integration. The first version of
+it assumed GitHub auto-creates a label when a new issue references it -
+untrue, confirmed against GitHub's own documentation and real bug reports
+once actually told to research GitHub's specific platform behavior rather
+than write code from general knowledge. That version would have failed
+outright the first time it ran against a real repository. The same
+research pass also surfaced that the design didn't actually scale the way
+it was claimed to (one API search call per flagged lead, against a
+platform rate limit that's a real, documented number, not a guess) -
+leading to a proper redesign and a database migration that was then
+separately verified against a simulated already-existing database to
+make sure it wouldn't silently corrupt real data.
+
 ## The honest pattern
 
 AI is fast at producing a plausible first draft and at running
 exhaustive, falsifiable tests once told exactly what to check. It does
 not reliably catch its own generic defaults, blind spots, or
-content-level mistakes by reviewing its own work. In this build, nearly
-every meaningful fix traces back to a specific, sometimes blunt question
-about whether something was actually true - asked, checked, and not let
-go of until it was either proven or fixed. That discipline is the actual
-reason this system is in the state it's in, and it's worth being
-straightforward about rather than presenting the result as something
-more automatic than it was.
+content-level mistakes by reviewing its own work - and it especially does
+not reliably know which of its own assumptions about a specific platform
+(GitHub's API behavior, Instagram's rate limits, a specific Python
+version) are actually true versus just plausible-sounding, unless directed
+to go and check. In this build, nearly every meaningful fix traces back to
+a specific, sometimes blunt question about whether something was actually
+true - asked, checked, and not let go of until it was either proven or
+fixed. That discipline is the actual reason this system is in the state
+it's in, and it's worth being straightforward about rather than
+presenting the result as something more automatic than it was.
+
+## The lesson worth carrying forward
+
+The clearest pattern across this entire build: almost every real bug
+traced back to an assumption about something specific - Fleek's actual
+business model, GitHub's actual platform behavior, a particular Python
+version, a specific API's rate limits - that turned out to be wrong, and
+was only caught because of a direct instruction to go research it
+properly rather than reason from general knowledge. The fix that came out
+of that pattern, late, every time, was always "research this specific
+thing properly first." The better version of this process would have
+front-loaded that instruction at the very start - asking for
+company-specific, industry-specific, and platform-specific research
+*before* writing the first line of code, rather than discovering each gap
+reactively, one expensive bug at a time, over the course of the build.
+That's a genuine process improvement worth carrying into the next project,
+not just a note about this one.
 
 See `DEVELOPMENT_LOG.md` for the complete trail, and `GTM_STRATEGY.md`
 for the commercial reasoning behind how the system prioritizes, sequences,

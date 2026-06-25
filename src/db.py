@@ -59,6 +59,22 @@ CREATE INDEX IF NOT EXISTS idx_leads_phone ON leads(phone);
 CREATE INDEX IF NOT EXISTS idx_leads_handle ON leads(handle);
 CREATE INDEX IF NOT EXISTS idx_leads_channel_stage ON leads(channel, stage);
 
+CREATE TABLE IF NOT EXISTS ingest_log_merges (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch_label     TEXT NOT NULL,
+    ingested_at     TEXT NOT NULL,
+    lead_key        TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ingest_log (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch_label     TEXT NOT NULL,
+    ingested_at     TEXT NOT NULL,
+    rows_seen       INTEGER NOT NULL,
+    new_leads       INTEGER NOT NULL,
+    merged_leads    INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS actions_log (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     lead_key        TEXT NOT NULL,
@@ -83,4 +99,20 @@ def connect(db_path: str) -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.executescript(SCHEMA)
+    _migrate(conn)
     return conn
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """CREATE TABLE IF NOT EXISTS only creates a table the first time a
+    database is built - it does nothing to a leads table that already
+    exists from before this column was added. Without this, adding
+    github_issue_number to SCHEMA above would silently have zero effect on
+    every database created before this change (including the one already
+    running in production), and the very first INSERT/UPDATE referencing
+    it would throw 'no such column' on a real, already-populated database.
+    """
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(leads)").fetchall()}
+    if "github_issue_number" not in cols:
+        conn.execute("ALTER TABLE leads ADD COLUMN github_issue_number INTEGER")
+        conn.commit()

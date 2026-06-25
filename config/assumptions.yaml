@@ -19,6 +19,17 @@ daily_caps:
 # the real number depends on Fleek's actual travel budget/time per trip.
 min_visit_cluster: 3
 
+# Max new GitHub Issues created per run for flagged data-quality leads.
+# At today's scale (~16 flagged out of 278 leads) this never gets close to
+# binding. At 30,000 leads, the same ~1% flag rate is ~300 leads - creating
+# 300 issues in one run would flood the Issues tab, so the highest-value
+# flagged leads get an issue first and the rest wait for the next run.
+data_quality_issue_cap: 20
+
+# Set this for running commands locally outside GitHub Actions (which sets
+# it automatically via GITHUB_REPOSITORY). Format: owner/repo-name.
+github_repo: null
+
 # --- Insert Fleek data here -------------------------------------------------
 # Everything below is `null` because we don't have it. Once Fleek has actual
 # channel performance numbers (from a CRM, dialer, or email tool - however

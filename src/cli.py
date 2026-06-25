@@ -637,6 +637,7 @@ def cmd_export_dashboard(args):
                 "action_type": action_row["action_type"] if action_row else None,
                 "message_draft": action_row["message_draft"] if action_row else None,
                 "queued_today": bool(action_row),
+                "source_lead_ids": lead["source_lead_ids"],
             })
         out.sort(key=lambda r: -r["score"])
         return out
@@ -686,6 +687,27 @@ def cmd_export_dashboard(args):
         for city, rows_ in sorted(by_city.items(), key=lambda kv: -len(kv[1]))
     ]
 
+    import_history = []
+    for r in conn.execute(
+        "SELECT batch_label, ingested_at, rows_seen, new_leads, merged_leads "
+        "FROM ingest_log ORDER BY id DESC LIMIT 10"
+    ).fetchall():
+        entry = dict(r)
+        merged_leads = []
+        for m in conn.execute(
+            "SELECT lead_key FROM ingest_log_merges WHERE batch_label=? AND ingested_at=?",
+            (r["batch_label"], r["ingested_at"]),
+        ).fetchall():
+            lead = conn.execute(
+                "SELECT store_name, handle, contact_name, source_lead_ids FROM leads WHERE lead_key=?",
+                (m["lead_key"],),
+            ).fetchone()
+            if lead:
+                name = lead["store_name"] or lead["handle"] or lead["contact_name"] or m["lead_key"]
+                merged_leads.append({"name": name, "source_lead_ids": lead["source_lead_ids"]})
+        entry["merged_lead_details"] = merged_leads
+        import_history.append(entry)
+
     snapshot = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "date": today_iso,
@@ -693,6 +715,7 @@ def cmd_export_dashboard(args):
         "stores": stores,
         "visit_plan": visit_plan,
         "caps": cfg.load_config()["daily_caps"],
+        "import_history": import_history,
     }
 
     docs_dir = Path("docs/data")
@@ -739,6 +762,110 @@ def cmd_redraft(args):
     conn.commit()
     print(f"[redraft] checked {len(rows)} queued-but-unsent actions for {today_iso}, "
           f"updated {updated} with current drafting logic")
+    conn.close()
+
+
+def cmd_sync_review_issues(args):
+    """Turns flagged data-quality leads into real GitHub Issues instead of
+    a CSV export nobody opens - the GitHub-native answer to 'every part of
+    this process should be runnable and visible from GitHub itself'.
+
+    Skips anything that already has a tracked issue (checked locally via
+    the lead's own github_issue_number column - zero API calls for
+    already-tracked leads, not a fresh search every single run), and caps
+    how many NEW issues get created per run so this doesn't flood the
+    Issues tab once there are hundreds of flagged leads at real scale.
+    """
+    from . import github_issues
+
+    conn = db.connect(args.db)
+    config = cfg.load_config()
+    rows = conn.execute(
+        "SELECT * FROM leads WHERE data_quality_flags != '[]' "
+        "ORDER BY COALESCE(est_monthly_spend_gbp, 0) DESC"
+    ).fetchall()
+
+    if not rows:
+        print("[sync-review-issues] nothing flagged right now")
+        conn.close()
+        return
+
+    if not github_issues._token():
+        print("[sync-review-issues] skipped - no GITHUB_TOKEN set. Inside GitHub "
+              "Actions this is automatic; running locally, export a personal "
+              "access token with the 'issues' scope first: "
+              "export GITHUB_TOKEN=<your token>")
+        conn.close()
+        return
+
+    repo = config.get("github_repo")
+    cap = config["data_quality_issue_cap"]
+
+    # The label has to exist before any issue can reference it - GitHub
+    # does NOT auto-create it (confirmed against GitHub's own docs and
+    # real bug reports - see github_issues.ensure_label_exists). This is
+    # the single most important line in this function: without it, every
+    # create_issue call below would fail with "Label does not exist".
+    try:
+        github_issues.ensure_label_exists(config_repo=repo)
+    except github_issues.GitHubIssuesUnavailable as e:
+        print(f"[sync-review-issues] could not ensure the label exists, stopping: {e}")
+        conn.close()
+        return
+
+    created, already_tracked, failed = 0, 0, 0
+
+    for r in rows:
+        # Fast path: this lead already has a tracked issue number stored
+        # locally - zero API calls needed, regardless of how many flagged
+        # leads exist in total. This is what keeps the steady-state cost
+        # of this command flat as the flagged-lead count grows, instead of
+        # making one search request per lead per run forever.
+        if r["github_issue_number"]:
+            already_tracked += 1
+            continue
+
+        if created >= cap:
+            continue  # leave it untracked - picked up next run, within the cap
+
+        try:
+            # Safety net for the one case the fast path can't see: an issue
+            # that was created by a previous, different database (e.g. the
+            # DB got reset but the GitHub issue itself is still open). Only
+            # hit for leads with no locally-stored number at all, so this
+            # never scales with the total flagged count, only with how many
+            # are genuinely new each run.
+            existing = github_issues.find_open_issue_number(r["lead_key"], config_repo=repo)
+            if existing:
+                conn.execute("UPDATE leads SET github_issue_number=? WHERE lead_key=?",
+                             (existing, r["lead_key"]))
+                already_tracked += 1
+                continue
+
+            name = r["store_name"] or r["handle"] or r["lead_key"]
+            title = f"Data quality review needed: {r['lead_key']} ({name})"
+            body = (
+                f"**Flags:** {r['data_quality_flags']}\n"
+                f"**Contact on file:** email={r['email'] or '-'}, phone={r['phone'] or '-'}\n"
+                f"**Est. monthly spend:** £{r['est_monthly_spend_gbp'] or 0}/mo\n"
+                f"**Merged from source record(s):** {r['source_lead_ids']}\n\n"
+                f"Resolve the actual contact detail (or confirm it's fine as-is), "
+                f"then close this issue."
+            )
+            number = github_issues.create_issue(title, body, config_repo=repo)
+            conn.execute("UPDATE leads SET github_issue_number=? WHERE lead_key=?",
+                         (number, r["lead_key"]))
+            created += 1
+        except github_issues.GitHubIssuesUnavailable as e:
+            print(f"[sync-review-issues] failed for {r['lead_key']}: {e}")
+            failed += 1
+
+    conn.commit()
+    if created >= cap:
+        print(f"[sync-review-issues] hit the cap of {cap} new issues this run - "
+              f"the rest will be picked up next run")
+    print(f"[sync-review-issues] {created} new issues created, "
+          f"{already_tracked} already tracked, {failed} failed")
     conn.close()
 
 
@@ -807,6 +934,9 @@ def main():
 
     p_redraft = sub.add_parser("redraft", help="Refresh message text for queued-but-unsent actions using current code")
     p_redraft.set_defaults(func=cmd_redraft)
+
+    p_issues = sub.add_parser("sync-review-issues", help="Turn flagged data-quality leads into GitHub Issues")
+    p_issues.set_defaults(func=cmd_sync_review_issues)
 
     args = p.parse_args()
     args.func(args)

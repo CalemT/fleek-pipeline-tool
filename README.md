@@ -52,6 +52,10 @@ python -m src.cli send --action-id 17
 #    low-confidence merges) instead of leaving it for someone to notice
 python -m src.cli review-queue
 
+# 6b. Turn those same flagged leads into real, clickable GitHub Issues
+#     (works automatically in GitHub Actions; needs GITHUB_TOKEN locally)
+python -m src.cli sync-review-issues
+
 # 7. Sanity-check the scoring rubric against real outcomes, once leads have
 #    actually resolved won/lost through the tool's own loop
 python -m src.cli calibration
@@ -131,6 +135,24 @@ you click into any lead to see its full picture: score, stage, segment,
 the actual drafted message, and the last thing they said to us. Visit plan
 gets its own tab showing which cities are flagged trip-worthy.
 
+**The dashboard is also the operational front end, not just a viewer.**
+Two buttons sit right in the header:
+- **"Add new leads"** - opens GitHub's own file-upload page, scoped to
+  `data/incoming/`. Drag a file in, commit it, no terminal involved.
+- **"Run today's plan"** - opens the Actions tab for the daily workflow,
+  where the existing "Run workflow" button triggers a fresh run on
+  demand, also with no terminal involved.
+
+A **"Recent imports"** panel under the header shows the last 10 batches
+ingested - batch name, when, exactly how many leads were new versus
+merged, **and which specific leads were merged** (e.g. "merged:
+heritagefinds") - so the day-1-vs-day-2 distinction the brief asks to
+demonstrate isn't just a number, it's a name you can point at. Click into
+any individual lead and, if it was ever merged from duplicate records,
+its detail panel permanently shows "Originally listed as 2 separate
+records (L0224, L0254)" - not just during the import window, but for as
+long as that lead exists.
+
 To make it live on GitHub Pages (so it updates every morning along with
 everything else, no download required):
 1. Repo **Settings** → **Pages** → under "Build and deployment," set
@@ -166,6 +188,63 @@ novel phrasing outside these categories falls back to a general (still
 improved) reply rather than guessing. Routing unclassified replies through
 an actual LLM call, grounded in the same research, is the natural next
 upgrade once messages need to handle truly open-ended replies.
+
+## Flagged leads become real GitHub Issues, not a CSV nobody opens
+
+`python -m src.cli sync-review-issues` turns every data-quality-flagged
+lead into an actual, clickable, closeable GitHub Issue (labeled
+`data-quality`), instead of a CSV export that sits in a folder. Wired
+into `run_daily.sh`, so this happens automatically every morning.
+
+**Two real things were found and fixed by actually researching GitHub's
+API behavior, not assuming it:**
+1. GitHub does **not** auto-create a label just because a new issue
+   references it - confirmed against GitHub's own docs ("the label(s)
+   must exist for your repository") and multiple real bug reports of
+   "Label does not exist" errors. The first version of this feature would
+   have failed outright the first time it ran against a real repo, since
+   a brand-new repo only has GitHub's defaults. Fixed with
+   `ensure_label_exists()`, which creates the label once (idempotently -
+   a 422 "already exists" response is treated as success, not an error).
+2. `GITHUB_TOKEN` is capped at 1,000 requests/hour per repo. The first
+   version searched the API once *per flagged lead, every single run* to
+   check for duplicates - fine at today's ~16 flagged leads, but wasteful
+   and fragile as that count grows toward 30,000-lead scale. Redesigned
+   so each lead's own GitHub issue number is stored locally
+   (`leads.github_issue_number`, added via a real migration so it doesn't
+   break already-populated databases) - the steady-state cost of this
+   command is then a handful of API calls for genuinely *new* flagged
+   leads only, not one search per lead forever. Verified with a real
+   integration test asserting the exact call counts, and verified the
+   migration separately against a simulated pre-existing database to
+   confirm no data loss.
+
+It also:
+- Caps how many *new* issues get created per run
+  (`data_quality_issue_cap` in `config/assumptions.yaml`, default 20) -
+  the highest-value flagged leads get an issue first, the rest wait
+- Uses only Python's standard library (`urllib`) to talk to the GitHub
+  API - no new dependency, no version-mismatch risk
+
+**Authentication:** inside GitHub Actions this works automatically - the
+workflow's own token gets `issues: write` permission and is passed to the
+script as an environment variable, no secret to create. Running it
+locally requires `export GITHUB_TOKEN=<a personal access token with the
+"issues" scope>` first; without it, the command skips with a clear
+message rather than crashing or silently doing nothing - verified this
+exact path locally.
+
+**Honest limitation that remains:** the request-building, deduplication,
+label-creation, and cap logic are all tested with a mocked GitHub API
+(`tests/test_github_issues.py`, 10 tests including two full integration
+tests). What still *isn't* verified from this side is an actual issue
+landing in a real, live repo's Issues tab - that needs one real run
+against real GitHub infrastructure to fully confirm, the same way the
+workflow's cache and Pages behavior needed a live run before either was
+trusted. Also a deliberate scope boundary, not an oversight: issues
+aren't auto-closed when the underlying flag clears - a person closes it
+once they've actually verified the fix, which is safer than auto-closing
+something that might have an ongoing discussion on it.
 
 ## Will this actually keep up at scale?
 
@@ -295,6 +374,7 @@ src/
   reply_intent.py  classifies a lead's reply (objection/question/etc) and
                    drafts an actually-responsive follow-up, not a generic wrapper
   config.py        loads config/assumptions.yaml - the seam for real Fleek data
+  github_issues.py talks to the GitHub Issues API (stdlib urllib only)
   cli.py           every command (ingest, plan, send, status, review-queue,
                    calibration, recalibrate, rebalance-caps, backlog-forecast,
                    visit-plan, export-dashboard, redraft, auto-ingest)

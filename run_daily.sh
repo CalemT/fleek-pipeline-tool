@@ -17,6 +17,7 @@ python3 -m src.cli auto-ingest --folder data/incoming 2>&1 | tee -a logs/daily.l
 python3 -m src.cli plan --date "$(date -u +%Y-%m-%d)" 2>&1 | tee -a logs/daily.log
 python3 -m src.cli visit-plan 2>&1 | tee -a logs/daily.log
 python3 -m src.cli redraft 2>&1 | tee -a logs/daily.log
+python3 -m src.cli sync-review-issues 2>&1 | tee -a logs/daily.log
 python3 -m src.cli export-dashboard 2>&1 | tee -a logs/daily.log
 
 echo "Done. See output/ for today's CSVs." | tee -a logs/daily.log

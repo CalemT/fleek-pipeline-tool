@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write   # needed for the keep-alive commit below
+  issues: write     # needed for sync-review-issues to create/find Issues
 
 jobs:
   plan:
@@ -51,7 +52,14 @@ jobs:
       # production (a scheduled CRM export, an Instagram-scraper output,
       # etc) - they'd land in data/incoming/ here before this step runs.
       # auto-ingest itself is already idempotent either way.
+      #
+      # GITHUB_TOKEN is the workflow's own automatic token (not a secret
+      # anyone has to create) - it's what lets sync-review-issues create
+      # GitHub Issues for flagged leads, scoped to exactly this repo by
+      # the `issues: write` permission above.
       - name: Run daily pipeline
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./run_daily.sh
 
       - name: Upload today's outreach queues

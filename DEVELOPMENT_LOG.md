@@ -154,6 +154,25 @@ showed the old, broken reply text.
 
 ---
 
+## Phase 11 - Refusing to accept "this is done," twice in a row
+
+**Trigger:** after being told the build was essentially complete and
+ready to deploy, the user explicitly rejected that framing twice in a
+row - first asking "why not GitHub Issues instead of a CSV," then,
+after that was built, demanding a genuinely critical re-audit rather than
+accepting it as finished.
+
+| # | Step | Detail |
+|---|---|---|
+| 11.1 | First build of the GitHub Issues feature | Looked complete: created issues, labeled them, deduplicated against open ones, capped per run, 7 tests passing |
+| 11.2 | Explicitly told to stop accepting that and research the actual platform | Searched GitHub's own documentation and real bug reports specifically about label behavior and API rate limits, rather than continuing to write code from general knowledge |
+| 11.3 | **Real bug found**: GitHub does not auto-create a label just because a new issue references it | Confirmed against GitHub's own docs ("the label(s) must exist") and multiple real "Label does not exist" bug reports. The shipped version would have failed outright the first time it ran against an actual repository, since a new repo only has GitHub's default labels |
+| 11.4 | **A second real bug found in the same research pass**: the design didn't scale the way it was claimed to | `GITHUB_TOKEN` is capped at 1,000 requests/hour per repo (a real, documented number) - the original design made one search call per flagged lead, every single run, which would not have held up as the flagged-lead count grew toward real scale |
+| 11.5 | Fix | Added `ensure_label_exists()` (idempotent - treats "already exists" as success, not an error) and redesigned tracking to store each lead's issue number locally, so steady-state cost no longer scales with the total number of flagged leads |
+| 11.6 | Verification that mattered most | The redesign required a new database column on a table that **already existed and was already populated** with hours of real data - tested this specific scenario directly by simulating an old-schema database and confirming the migration adds the column with zero data loss, rather than assuming a schema change is safe |
+
+---
+
 ## What this log is for
 
 Anyone reading this top to bottom should be able to see exactly which

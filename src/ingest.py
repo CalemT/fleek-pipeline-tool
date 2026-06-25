@@ -191,6 +191,7 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
     # same batch (a row matching another row from this same file) merge
     # against the latest in-memory state, not a stale DB read.
     leads_cache = {}
+    merge_events = []  # which existing lead_keys got merged into during this batch
 
     for _, raw_row in df.iterrows():
         c = _clean_row(raw_row)
@@ -223,6 +224,7 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
             leads_cache[existing["lead_key"]] = merged
             index.register(existing["lead_key"], c)
             stats["merged_into_existing"] += 1
+            merge_events.append(existing["lead_key"])
         else:
             lead_key = f"lead:{c['lead_id']}"
             channel = classify_channel(c["email"], c["phone"], c["handle"])
@@ -295,5 +297,15 @@ def ingest_batch(conn, path: str, sheet_name, batch_label: str) -> dict:
             data_quality_flags=excluded.data_quality_flags, updated_at=excluded.updated_at
     """
     conn.executemany(upsert_sql, list(leads_cache.values()))
+    conn.execute(
+        "INSERT INTO ingest_log (batch_label, ingested_at, rows_seen, new_leads, merged_leads) "
+        "VALUES (?,?,?,?,?)",
+        (batch_label, now, stats["rows_seen"], stats["new_leads"], stats["merged_into_existing"]),
+    )
+    if merge_events:
+        conn.executemany(
+            "INSERT INTO ingest_log_merges (batch_label, ingested_at, lead_key) VALUES (?,?,?)",
+            [(batch_label, now, lk) for lk in merge_events],
+        )
     conn.commit()
     return stats

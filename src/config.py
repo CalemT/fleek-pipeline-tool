@@ -17,6 +17,8 @@ DEFAULT_PATH = Path(__file__).resolve().parents[1] / "config" / "assumptions.yam
 _FALLBACK = {
     "daily_caps": {"instagram_dm": 40, "email": 150, "call": 30, "visit": 5},
     "min_visit_cluster": 3,
+    "data_quality_issue_cap": 20,
+    "github_repo": None,
     "channel_performance": {
         "instagram_dm": {"reply_rate": None, "conversion_rate": None},
         "email": {"reply_rate": None, "conversion_rate": None},

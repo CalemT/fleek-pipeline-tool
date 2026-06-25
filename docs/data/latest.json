@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T11:48:33.750152+00:00",
+  "generated_at": "2026-06-25T19:56:08.746323+00:00",
   "date": "2026-06-25",
   "instagram": [
     {
@@ -24,7 +24,8 @@
       "notes": "ref from supplier",
       "action_type": "dm_followup",
       "message_draft": "Happy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0012"
     },
     {
       "lead_key": "lead:L0055",
@@ -48,7 +49,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Makes sense, take your time. Just flag whenever's good and I'll work around it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0055"
     },
     {
       "lead_key": "lead:L0060",
@@ -72,7 +74,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0060"
     },
     {
       "lead_key": "lead:L0014",
@@ -96,7 +99,8 @@
       "notes": "ref from supplier",
       "action_type": "dm_followup",
       "message_draft": "Makes sense, take your time. Just flag whenever's good and I'll work around it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0014"
     },
     {
       "lead_key": "lead:L0020",
@@ -120,7 +124,8 @@
       "notes": "high engagement acct",
       "action_type": "dm_followup",
       "message_draft": "Makes sense, take your time. Just flag whenever's good and I'll work around it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0020"
     },
     {
       "lead_key": "lead:L0126",
@@ -144,7 +149,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0126"
     },
     {
       "lead_key": "lead:L0058",
@@ -168,7 +174,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0058"
     },
     {
       "lead_key": "lead:L0050",
@@ -192,7 +199,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Totally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0050"
     },
     {
       "lead_key": "lead:L0009",
@@ -216,7 +224,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0009"
     },
     {
       "lead_key": "lead:L0145",
@@ -240,7 +249,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Love that - 15 minutes this week to sort the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0145"
     },
     {
       "lead_key": "lead:L0044",
@@ -264,7 +274,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0044"
     },
     {
       "lead_key": "lead:L0085",
@@ -288,7 +299,8 @@
       "notes": "high engagement acct",
       "action_type": "dm_followup",
       "message_draft": "Fair enough. Doesn't have to be either/or - happy to be a backup option whenever the timing's better for you.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0085"
     },
     {
       "lead_key": "lead:L0061",
@@ -312,7 +324,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "Understood, that's a reasonable call. If a one-off batch ever makes sense down the line, just flag it - otherwise I won't keep chasing.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0061,L0265"
     },
     {
       "lead_key": "lead:L0138",
@@ -336,7 +349,8 @@
       "notes": "met at market",
       "action_type": "dm_followup",
       "message_draft": "Makes sense, take your time. Just flag whenever's good and I'll work around it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0138"
     },
     {
       "lead_key": "lead:L0108",
@@ -360,7 +374,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0108"
     },
     {
       "lead_key": "lead:L0142",
@@ -384,7 +399,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0142"
     },
     {
       "lead_key": "lead:L0013",
@@ -408,7 +424,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Totally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0013"
     },
     {
       "lead_key": "lead:L0063",
@@ -432,7 +449,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "No rush at all - I'll check back in a couple of weeks unless you'd rather pick a date now.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0063"
     },
     {
       "lead_key": "lead:L0007",
@@ -456,7 +474,8 @@
       "notes": "wants menswear focus",
       "action_type": "dm_followup",
       "message_draft": "Following up on this - still keen to chat? Happy to work around your schedule.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0007"
     },
     {
       "lead_key": "lead:L0095",
@@ -480,7 +499,8 @@
       "notes": "met at market",
       "action_type": "dm_followup",
       "message_draft": "Happy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0095"
     },
     {
       "lead_key": "lead:L0148",
@@ -504,7 +524,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Circling back on this one - want to find a time this week, or is it still too soon?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0148"
     },
     {
       "lead_key": "lead:L0026",
@@ -528,7 +549,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "Following up on this - still keen to chat? Happy to work around your schedule.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0026"
     },
     {
       "lead_key": "lead:L0118",
@@ -552,7 +574,8 @@
       "notes": "slow to reply",
       "action_type": "dm_followup",
       "message_draft": "Fair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0118"
     },
     {
       "lead_key": "lead:L0046",
@@ -576,7 +599,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0046"
     },
     {
       "lead_key": "lead:L0124",
@@ -600,7 +624,8 @@
       "notes": "wants menswear focus",
       "action_type": "dm_followup",
       "message_draft": "Fair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0124"
     },
     {
       "lead_key": "lead:L0005",
@@ -624,7 +649,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Love that - 15 minutes this week to sort the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0005"
     },
     {
       "lead_key": "lead:L0081",
@@ -648,7 +674,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "Understood, that's a reasonable call. If a one-off batch ever makes sense down the line, just flag it - otherwise I won't keep chasing.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0081"
     },
     {
       "lead_key": "lead:L0043",
@@ -672,7 +699,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Fair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0043"
     },
     {
       "lead_key": "lead:L0088",
@@ -696,7 +724,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Happy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0088"
     },
     {
       "lead_key": "lead:L0091",
@@ -720,7 +749,8 @@
       "notes": "wants menswear focus",
       "action_type": "dm_followup",
       "message_draft": "Happy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0091"
     },
     {
       "lead_key": "lead:L0016",
@@ -744,7 +774,8 @@
       "notes": "high engagement acct",
       "action_type": "dm_followup",
       "message_draft": "Makes sense, take your time. Just flag whenever's good and I'll work around it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0016"
     },
     {
       "lead_key": "lead:L0263",
@@ -768,7 +799,8 @@
       "notes": "owner travels a lot",
       "action_type": "dm_followup",
       "message_draft": "Great, let's lock in a time - what works for you this week?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0015,L0263"
     },
     {
       "lead_key": "lead:L0001",
@@ -792,7 +824,8 @@
       "notes": "follows competitor",
       "action_type": "dm_followup",
       "message_draft": "Fair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0001"
     },
     {
       "lead_key": "lead:L0135",
@@ -816,7 +849,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0135"
     },
     {
       "lead_key": "lead:L0028",
@@ -840,7 +874,8 @@
       "notes": "price sensitive",
       "action_type": "dm_followup",
       "message_draft": "Totally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0028"
     },
     {
       "lead_key": "lead:L0053",
@@ -864,7 +899,8 @@
       "notes": null,
       "action_type": "dm_followup",
       "message_draft": "Good question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0053"
     },
     {
       "lead_key": "lead:L0261",
@@ -888,7 +924,8 @@
       "notes": "met at market",
       "action_type": "dm_followup",
       "message_draft": "Understood, that's a reasonable call. If a one-off batch ever makes sense down the line, just flag it - otherwise I won't keep chasing.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0002,L0261"
     },
     {
       "lead_key": "lead:L0056",
@@ -912,7 +949,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0056"
     },
     {
       "lead_key": "lead:L0045",
@@ -936,7 +974,8 @@
       "notes": "follows competitor",
       "action_type": "dm_followup",
       "message_draft": "Good question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0045"
     },
     {
       "lead_key": "lead:L0076",
@@ -960,7 +999,8 @@
       "notes": "big consignment potential",
       "action_type": "dm_followup",
       "message_draft": "Good question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0076"
     },
     {
       "lead_key": "lead:L0262",
@@ -984,7 +1024,8 @@
       "notes": "follows competitor | slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0021,L0262"
     },
     {
       "lead_key": "lead:L0052",
@@ -1008,7 +1049,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0052"
     },
     {
       "lead_key": "lead:L0117",
@@ -1032,7 +1074,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0117"
     },
     {
       "lead_key": "lead:L0008",
@@ -1056,7 +1099,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0008"
     },
     {
       "lead_key": "lead:L0116",
@@ -1080,7 +1124,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0116"
     },
     {
       "lead_key": "lead:L0010",
@@ -1104,7 +1149,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0010"
     },
     {
       "lead_key": "lead:L0127",
@@ -1128,7 +1174,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0127"
     },
     {
       "lead_key": "lead:L0057",
@@ -1152,7 +1199,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0057"
     },
     {
       "lead_key": "lead:L0141",
@@ -1176,7 +1224,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0141"
     },
     {
       "lead_key": "lead:L0125",
@@ -1200,7 +1249,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0125"
     },
     {
       "lead_key": "lead:L0139",
@@ -1224,7 +1274,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0139"
     },
     {
       "lead_key": "lead:L0006",
@@ -1248,7 +1299,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0006"
     },
     {
       "lead_key": "lead:L0018",
@@ -1272,7 +1324,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0018"
     },
     {
       "lead_key": "lead:L0048",
@@ -1296,7 +1349,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0048"
     },
     {
       "lead_key": "lead:L0107",
@@ -1320,7 +1374,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0107"
     },
     {
       "lead_key": "lead:L0051",
@@ -1344,7 +1399,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0051"
     },
     {
       "lead_key": "lead:L0075",
@@ -1368,7 +1424,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0075"
     },
     {
       "lead_key": "lead:L0099",
@@ -1392,7 +1449,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0099"
     },
     {
       "lead_key": "lead:L0109",
@@ -1416,7 +1474,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0109"
     },
     {
       "lead_key": "lead:L0017",
@@ -1440,7 +1499,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0017"
     },
     {
       "lead_key": "lead:L0104",
@@ -1464,7 +1524,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0104"
     },
     {
       "lead_key": "lead:L0027",
@@ -1488,7 +1549,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0027"
     },
     {
       "lead_key": "lead:L0090",
@@ -1512,7 +1574,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0090"
     },
     {
       "lead_key": "lead:L0257",
@@ -1536,7 +1599,8 @@
       "notes": "big consignment potential | ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0080,L0257"
     },
     {
       "lead_key": "lead:L0086",
@@ -1560,7 +1624,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0086"
     },
     {
       "lead_key": "lead:L0078",
@@ -1584,7 +1649,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0078"
     },
     {
       "lead_key": "lead:L0105",
@@ -1608,7 +1674,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0105"
     },
     {
       "lead_key": "lead:L0022",
@@ -1632,7 +1699,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0022"
     },
     {
       "lead_key": "lead:L0054",
@@ -1656,7 +1724,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0054"
     },
     {
       "lead_key": "lead:L0065",
@@ -1680,7 +1749,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0065"
     },
     {
       "lead_key": "lead:L0073",
@@ -1704,7 +1774,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0073,L0294"
     },
     {
       "lead_key": "lead:L0132",
@@ -1728,7 +1799,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0132"
     },
     {
       "lead_key": "lead:L0064",
@@ -1752,7 +1824,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0064"
     },
     {
       "lead_key": "lead:L0004",
@@ -1776,7 +1849,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0004"
     },
     {
       "lead_key": "lead:L0134",
@@ -1800,7 +1874,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0134"
     },
     {
       "lead_key": "lead:L0264",
@@ -1824,7 +1899,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0115,L0264"
     },
     {
       "lead_key": "lead:L0147",
@@ -1848,7 +1924,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0147"
     },
     {
       "lead_key": "lead:L0122",
@@ -1872,7 +1949,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0122"
     },
     {
       "lead_key": "lead:L0098",
@@ -1896,7 +1974,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0098"
     },
     {
       "lead_key": "lead:L0119",
@@ -1920,7 +1999,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0119"
     },
     {
       "lead_key": "lead:L0097",
@@ -1944,7 +2024,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0097"
     },
     {
       "lead_key": "lead:L0066",
@@ -1968,7 +2049,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0066"
     },
     {
       "lead_key": "lead:L0011",
@@ -1992,7 +2074,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0011"
     },
     {
       "lead_key": "lead:L0003",
@@ -2016,7 +2099,8 @@
       "notes": "high engagement acct | met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0003,L0251"
     },
     {
       "lead_key": "lead:L0100",
@@ -2040,7 +2124,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0100"
     },
     {
       "lead_key": "lead:L0082",
@@ -2064,7 +2149,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0082"
     },
     {
       "lead_key": "lead:L0121",
@@ -2088,7 +2174,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0121"
     },
     {
       "lead_key": "lead:L0024",
@@ -2112,7 +2199,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0024"
     },
     {
       "lead_key": "lead:L0049",
@@ -2136,7 +2224,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0049"
     },
     {
       "lead_key": "lead:L0110",
@@ -2160,7 +2249,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0110"
     },
     {
       "lead_key": "lead:L0131",
@@ -2184,7 +2274,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0131"
     },
     {
       "lead_key": "lead:L0114",
@@ -2208,7 +2299,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0114"
     },
     {
       "lead_key": "lead:L0280",
@@ -2232,7 +2324,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0280"
     },
     {
       "lead_key": "lead:L0276",
@@ -2256,7 +2349,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0276"
     },
     {
       "lead_key": "lead:L0077",
@@ -2280,7 +2374,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0077"
     },
     {
       "lead_key": "lead:L0267",
@@ -2304,7 +2399,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0267"
     },
     {
       "lead_key": "lead:L0093",
@@ -2328,7 +2424,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0093"
     },
     {
       "lead_key": "lead:L0101",
@@ -2352,7 +2449,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0101"
     },
     {
       "lead_key": "lead:L0112",
@@ -2376,7 +2474,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0112"
     },
     {
       "lead_key": "lead:L0084",
@@ -2400,7 +2499,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0084"
     },
     {
       "lead_key": "lead:L0149",
@@ -2424,7 +2524,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0149"
     },
     {
       "lead_key": "lead:L0130",
@@ -2448,7 +2549,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0130,L0295"
     },
     {
       "lead_key": "lead:L0047",
@@ -2472,7 +2574,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0047"
     },
     {
       "lead_key": "lead:L0269",
@@ -2496,7 +2599,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0269"
     },
     {
       "lead_key": "lead:L0283",
@@ -2520,7 +2624,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0283"
     },
     {
       "lead_key": "lead:L0278",
@@ -2544,7 +2649,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0278"
     },
     {
       "lead_key": "lead:L0275",
@@ -2568,7 +2674,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0275"
     },
     {
       "lead_key": "lead:L0062",
@@ -2592,7 +2699,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0062"
     },
     {
       "lead_key": "lead:L0285",
@@ -2616,7 +2724,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0285"
     },
     {
       "lead_key": "lead:L0281",
@@ -2640,7 +2749,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0281"
     },
     {
       "lead_key": "lead:L0072",
@@ -2664,7 +2774,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0072"
     },
     {
       "lead_key": "lead:L0041",
@@ -2688,7 +2799,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0041"
     },
     {
       "lead_key": "lead:L0069",
@@ -2712,7 +2824,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0069"
     },
     {
       "lead_key": "lead:L0253",
@@ -2736,7 +2849,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0120,L0253"
     },
     {
       "lead_key": "lead:L0140",
@@ -2760,7 +2874,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0140"
     },
     {
       "lead_key": "lead:L0092",
@@ -2784,7 +2899,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0092"
     },
     {
       "lead_key": "lead:L0136",
@@ -2808,7 +2924,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0136"
     },
     {
       "lead_key": "lead:L0143",
@@ -2832,7 +2949,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0143"
     },
     {
       "lead_key": "lead:L0103",
@@ -2856,7 +2974,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0103"
     },
     {
       "lead_key": "lead:L0113",
@@ -2880,7 +2999,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0113"
     },
     {
       "lead_key": "lead:L0128",
@@ -2904,7 +3024,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0128"
     },
     {
       "lead_key": "lead:L0133",
@@ -2928,7 +3049,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0133"
     },
     {
       "lead_key": "lead:L0111",
@@ -2952,7 +3074,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0111"
     },
     {
       "lead_key": "lead:L0068",
@@ -2976,7 +3099,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0068"
     },
     {
       "lead_key": "lead:L0137",
@@ -3000,7 +3124,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0137"
     },
     {
       "lead_key": "lead:L0096",
@@ -3024,7 +3149,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0096"
     },
     {
       "lead_key": "lead:L0029",
@@ -3048,7 +3174,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0029"
     },
     {
       "lead_key": "lead:L0036",
@@ -3072,7 +3199,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0036"
     },
     {
       "lead_key": "lead:L0102",
@@ -3096,7 +3224,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0102"
     },
     {
       "lead_key": "lead:L0031",
@@ -3120,7 +3249,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0031"
     },
     {
       "lead_key": "lead:L0034",
@@ -3144,7 +3274,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0034"
     },
     {
       "lead_key": "lead:L0089",
@@ -3168,7 +3299,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0089"
     },
     {
       "lead_key": "lead:L0033",
@@ -3192,7 +3324,8 @@
       "notes": "big consignment potential",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0033"
     },
     {
       "lead_key": "lead:L0040",
@@ -3216,7 +3349,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0040"
     },
     {
       "lead_key": "lead:L0038",
@@ -3240,7 +3374,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0038"
     },
     {
       "lead_key": "lead:L0037",
@@ -3264,7 +3399,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0037"
     },
     {
       "lead_key": "lead:L0129",
@@ -3288,7 +3424,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0129"
     },
     {
       "lead_key": "lead:L0030",
@@ -3312,7 +3449,8 @@
       "notes": "met at market",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0030"
     },
     {
       "lead_key": "lead:L0032",
@@ -3336,7 +3474,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0032"
     },
     {
       "lead_key": "lead:L0035",
@@ -3360,7 +3499,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0035"
     }
   ],
   "stores": [
@@ -3386,7 +3526,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @staticvintage\n\nHi Marcus,\n\nGood question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0025"
     },
     {
       "lead_key": "lead:L0236",
@@ -3410,7 +3551,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Maison Emporium\n\nHi Felix,\n\nTotally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0236"
     },
     {
       "lead_key": "lead:L0235",
@@ -3434,7 +3576,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Brick Lane Threads\n\nHi Cora,\n\nNo rush at all - I'll check back in a couple of weeks unless you'd rather pick a date now.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0235"
     },
     {
       "lead_key": "lead:L0223",
@@ -3458,7 +3601,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Old Lab\n\nHi Elena,\n\nFair enough. Doesn't have to be either/or - happy to be a backup option whenever the timing's better for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0223"
     },
     {
       "lead_key": "lead:L0214",
@@ -3482,7 +3626,8 @@
       "notes": "high engagement acct",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for House of Wardrobe\n\nHi Hugo,\n\nFair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0214"
     },
     {
       "lead_key": "lead:L0160",
@@ -3506,7 +3651,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Found Exchange\n\nHi Tom,\n\nLove that - 15 minutes this week to sort the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0160"
     },
     {
       "lead_key": "lead:L0191",
@@ -3530,7 +3676,8 @@
       "notes": "ref from supplier",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Old Rail (LA): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0191"
     },
     {
       "lead_key": "lead:L0231",
@@ -3554,7 +3701,8 @@
       "notes": null,
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for House of Lane\n\nHi Raj,\n\nMakes sense, take your time. Just flag whenever's good and I'll work around it.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0231"
     },
     {
       "lead_key": "lead:L0174",
@@ -3578,7 +3726,8 @@
       "notes": "slow to reply",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Second Collective\n\nHi Lukas,\n\nFair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0174"
     },
     {
       "lead_key": "lead:L0159",
@@ -3602,7 +3751,8 @@
       "notes": "met at market",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Camden Vault (Amsterdam): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0159"
     },
     {
       "lead_key": "lead:L0161",
@@ -3626,7 +3776,8 @@
       "notes": "big consignment potential",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Maison Rail\n\nHi Noah,\n\nFair ask - it varies by volume and category, so a quick call or an emailed breakdown beats me estimating here. Which's easier for you?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0161"
     },
     {
       "lead_key": "lead:L0211",
@@ -3650,7 +3801,8 @@
       "notes": "met at market",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Second Society\n\nHi Aisha,\n\nGreat, let's lock in a time - what works for you this week?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0211"
     },
     {
       "lead_key": "lead:L0195",
@@ -3674,7 +3826,8 @@
       "notes": "high engagement acct",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Rusty Edit (Berlin): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0195"
     },
     {
       "lead_key": "lead:L0219",
@@ -3698,7 +3851,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Corner Vault\n\nHi Marcus,\n\nTotally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0219"
     },
     {
       "lead_key": "lead:L0225",
@@ -3722,7 +3876,8 @@
       "notes": "owner travels a lot",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Camden Loom\n\nHi Zoe,\n\nGood question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0225"
     },
     {
       "lead_key": "lead:L0227",
@@ -3746,7 +3901,8 @@
       "notes": "owner travels a lot",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Loft Emporium (Brighton): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0227"
     },
     {
       "lead_key": "lead:L0224",
@@ -3770,7 +3926,8 @@
       "notes": "met at market",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Past Cellar\n\nHi Tom,\n\nFollowing up on this - still keen to chat? Happy to work around your schedule.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0224,L0254"
     },
     {
       "lead_key": "lead:L0230",
@@ -3794,7 +3951,8 @@
       "notes": null,
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Second Garms\n\nHi James,\n\nHappy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0230"
     },
     {
       "lead_key": "lead:L0250",
@@ -3818,7 +3976,8 @@
       "notes": "wants menswear focus",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Brick Lane Emporium (Bristol): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0250"
     },
     {
       "lead_key": "lead:L0208",
@@ -3842,7 +4001,8 @@
       "notes": null,
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Corner Emporium\n\nHi Nadia,\n\nNo rush at all - I'll check back in a couple of weeks unless you'd rather pick a date now.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0208"
     },
     {
       "lead_key": "lead:L0228",
@@ -3866,7 +4026,8 @@
       "notes": "high engagement acct",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Second Trunk (New York): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0228"
     },
     {
       "lead_key": "lead:L0260",
@@ -3890,7 +4051,8 @@
       "notes": "price sensitive",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Vintage Closet\n\nHi Noah,\n\nTotally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0240,L0260"
     },
     {
       "lead_key": "lead:L0019",
@@ -3914,7 +4076,8 @@
       "notes": "big consignment potential",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @archiveatticvintage\n\nHi there,\n\nHappy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0019"
     },
     {
       "lead_key": "lead:L0171",
@@ -3938,7 +4101,8 @@
       "notes": "met at market",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Past Lab (Bristol): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0171"
     },
     {
       "lead_key": "lead:L0218",
@@ -3962,7 +4126,8 @@
       "notes": "follows competitor",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Loft Threads\n\nHi Freya,\n\nGood question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0218"
     },
     {
       "lead_key": "lead:L0087",
@@ -3986,7 +4151,8 @@
       "notes": "high engagement acct",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @giltwornarchive\n\nHi there,\n\nHappy to walk through that properly - quickest is a short call, or I can put the basics in writing if that's easier for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0087"
     },
     {
       "lead_key": "lead:L0167",
@@ -4010,7 +4176,8 @@
       "notes": "met at market",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Rusty Edit\n\nHi Pablo,\n\nUnderstood, that's a reasonable call. If a one-off batch ever makes sense down the line, just flag it - otherwise I won't keep chasing.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0167"
     },
     {
       "lead_key": "lead:L0221",
@@ -4034,7 +4201,8 @@
       "notes": "big consignment potential",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Found Vault (Berlin): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0221"
     },
     {
       "lead_key": "lead:L0023",
@@ -4058,7 +4226,8 @@
       "notes": "price sensitive",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @cobaltfadedstore\n\nHi there,\n\nLove that - 15 minutes this week to sort the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0023"
     },
     {
       "lead_key": "lead:L0059",
@@ -4082,7 +4251,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @emberarchive\n\nHi Tom,\n\nGreat, let's lock in a time - what works for you this week?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0059"
     },
     {
       "lead_key": "lead:L0163",
@@ -4106,7 +4276,8 @@
       "notes": "owner travels a lot",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Blue Collective\n\nHi Tom,\n\nGood question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0163"
     },
     {
       "lead_key": "lead:L0144",
@@ -4130,7 +4301,8 @@
       "notes": "follows competitor",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @y2kvaultcollective\n\nHi there,\n\nGreat, let's lock in a time - what works for you this week?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0144"
     },
     {
       "lead_key": "lead:L0186",
@@ -4154,7 +4326,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Past Edit\n\nHi Carlos,\n\nTotally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0186"
     },
     {
       "lead_key": "lead:L0256",
@@ -4178,7 +4351,8 @@
       "notes": "met at market",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Rusty Cellar\n\nHi Raj,\n\nFollowing up on this - still keen to chat? Happy to work around your schedule.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0176,L0256"
     },
     {
       "lead_key": "lead:L0170",
@@ -4202,7 +4376,8 @@
       "notes": "slow to reply",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Camden Garms\n\nHi Elena,\n\nMakes sense, take your time. Just flag whenever's good and I'll work around it.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0170"
     },
     {
       "lead_key": "lead:L0233",
@@ -4226,7 +4401,8 @@
       "notes": "price sensitive",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for The Collective\n\nHi Priya,\n\nMakes sense, take your time. Just flag whenever's good and I'll work around it.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0233"
     },
     {
       "lead_key": "lead:L0071",
@@ -4250,7 +4426,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @vntgcobaltarchive\n\nHi Hugo,\n\nFair enough. Doesn't have to be either/or - happy to be a backup option whenever the timing's better for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0071"
     },
     {
       "lead_key": "lead:L0232",
@@ -4274,7 +4451,8 @@
       "notes": "slow to reply",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Retro Wardrobe\n\nHi Liam,\n\nGood question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0232"
     },
     {
       "lead_key": "lead:L0209",
@@ -4298,7 +4476,8 @@
       "notes": "price sensitive",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Corner Trunk\n\nHi Marcus,\n\nCircling back on this one - want to find a time this week, or is it still too soon?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0209"
     },
     {
       "lead_key": "lead:L0245",
@@ -4322,7 +4501,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Blue Garms\n\nHi Zoe,\n\nFair enough. Doesn't have to be either/or - happy to be a backup option whenever the timing's better for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0245"
     },
     {
       "lead_key": "lead:L0185",
@@ -4346,7 +4526,8 @@
       "notes": null,
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Brick Lane Closet\n\nHi Zoe,\n\nGood question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0185"
     },
     {
       "lead_key": "lead:L0199",
@@ -4370,7 +4551,8 @@
       "notes": "slow to reply",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Vintage Lane\n\nHi Zoe,\n\nLove that - 15 minutes this week to sort the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0199"
     },
     {
       "lead_key": "lead:L0158",
@@ -4394,7 +4576,8 @@
       "notes": "high engagement acct",
       "action_type": "call_confirm",
       "message_draft": "CALL SCRIPT - Velvet Edit (Berlin): Confirm the booked call time and agenda; come ready to agree a first order.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0158"
     },
     {
       "lead_key": "lead:L0222",
@@ -4418,7 +4601,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Corner Loom\n\nHi Theo,\n\nGood question - pricing depends on order size and category, so I'd rather give you real numbers than guess over email. Want a quick breakdown, or is a short call easier?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0222"
     },
     {
       "lead_key": "lead:L0242",
@@ -4442,7 +4626,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Velvet Trunk\n\nHi Nadia,\n\nFair enough. Doesn't have to be either/or - happy to be a backup option whenever the timing's better for you.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0242"
     },
     {
       "lead_key": "lead:L0203",
@@ -4466,7 +4651,8 @@
       "notes": "ref from supplier",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Past Cellar\n\nHi Greta,\n\nMakes sense, take your time. Just flag whenever's good and I'll work around it.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0203"
     },
     {
       "lead_key": "lead:L0255",
@@ -4490,7 +4676,8 @@
       "notes": "high engagement acct | follows competitor",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Velvet Trunk\n\nHi Omar,\n\nGreat, let's lock in a time - what works for you this week?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0165,L0255"
     },
     {
       "lead_key": "lead:L0074",
@@ -4514,7 +4701,8 @@
       "notes": null,
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for @atticcollective\n\nHi Tom,\n\nFollowing up on this - still keen to chat? Happy to work around your schedule.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0074"
     },
     {
       "lead_key": "lead:L0248",
@@ -4538,7 +4726,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Atelier Garms\n\nHi Carlos,\n\nFollowing up on this - still keen to chat? Happy to work around your schedule.\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0248"
     },
     {
       "lead_key": "lead:L0183",
@@ -4562,7 +4751,8 @@
       "notes": "price sensitive",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Old Lane\n\nHi James,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0183"
     },
     {
       "lead_key": "lead:L0241",
@@ -4586,7 +4776,8 @@
       "notes": "slow to reply",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Maison Vault\n\nHi Elena,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0241"
     },
     {
       "lead_key": "lead:L0258",
@@ -4610,7 +4801,8 @@
       "notes": "met at market",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Second Threads\n\nHi Bea,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0152,L0258"
     },
     {
       "lead_key": "lead:L0162",
@@ -4634,7 +4826,8 @@
       "notes": "met at market",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Velvet Closet\n\nHi Hugo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0162"
     },
     {
       "lead_key": "lead:L0206",
@@ -4658,7 +4851,8 @@
       "notes": "price sensitive",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Atelier Loom\n\nHi Ines,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0206"
     },
     {
       "lead_key": "lead:L0197",
@@ -4682,7 +4876,8 @@
       "notes": "high engagement acct",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Corner Loom\n\nHi Yuki,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0197"
     },
     {
       "lead_key": "lead:L0212",
@@ -4706,7 +4901,8 @@
       "notes": "ref from supplier",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Golden Lane\n\nHi Sven,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0212"
     },
     {
       "lead_key": "lead:L0210",
@@ -4730,7 +4926,8 @@
       "notes": "high engagement acct",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Old Collective\n\nHi James,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0210"
     },
     {
       "lead_key": "lead:L0234",
@@ -4754,7 +4951,8 @@
       "notes": "price sensitive",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Blue Vault\n\nHi Aisha,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0234"
     },
     {
       "lead_key": "lead:L0179",
@@ -4778,7 +4976,8 @@
       "notes": "met at market",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Velvet Emporium\n\nHi Carlos,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0179"
     },
     {
       "lead_key": "lead:L0259",
@@ -4802,7 +5001,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Past Lane\n\nHi Aisha,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0151,L0259"
     },
     {
       "lead_key": "lead:L0182",
@@ -4826,7 +5026,8 @@
       "notes": "owner travels a lot",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Camden Cellar\n\nHi Freya,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0182"
     },
     {
       "lead_key": "lead:L0168",
@@ -4850,7 +5051,8 @@
       "notes": "owner travels a lot",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Rusty Edit\n\nHi Yuki,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0168"
     },
     {
       "lead_key": "lead:L0287",
@@ -4874,7 +5076,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Atelier Drawer\n\nHi Marta,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0287"
     },
     {
       "lead_key": "lead:L0290",
@@ -4898,7 +5101,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Vintage Collective\n\nHi James,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0290"
     },
     {
       "lead_key": "lead:L0271",
@@ -4922,7 +5126,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Golden Lane\n\nHi Dmitri,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0271"
     },
     {
       "lead_key": "lead:L0288",
@@ -4946,7 +5151,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Blue Lab\n\nHi Sofia,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0288"
     },
     {
       "lead_key": "lead:L0200",
@@ -4970,7 +5176,8 @@
       "notes": "high engagement acct",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Found Bazaar\n\nHi Zoe,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0200"
     },
     {
       "lead_key": "lead:L0286",
@@ -4994,7 +5201,8 @@
       "notes": "follows competitor",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Old Vault\n\nHi Pablo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0286"
     },
     {
       "lead_key": "lead:L0164",
@@ -5018,7 +5226,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Golden Emporium\n\nHi Hugo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0164"
     },
     {
       "lead_key": "lead:L0270",
@@ -5042,7 +5251,8 @@
       "notes": "ref from supplier",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Past Edit\n\nHi Nadia,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0270"
     },
     {
       "lead_key": "lead:L0274",
@@ -5066,7 +5276,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Blue Trunk\n\nHi Tom,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0274"
     },
     {
       "lead_key": "lead:L0243",
@@ -5090,7 +5301,8 @@
       "notes": "price sensitive",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Vintage Lane\n\nHi Raj,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0243"
     },
     {
       "lead_key": "lead:L0244",
@@ -5114,7 +5326,8 @@
       "notes": "slow to reply",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for The Vault\n\nHi Marcus,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0244"
     },
     {
       "lead_key": "lead:L0268",
@@ -5138,7 +5351,8 @@
       "notes": "slow to reply",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for The Trunk\n\nHi Noah,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0268"
     },
     {
       "lead_key": "lead:L0282",
@@ -5162,7 +5376,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Rusty Cellar\n\nHi Nadia,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0282"
     },
     {
       "lead_key": "lead:L0272",
@@ -5186,7 +5401,8 @@
       "notes": "slow to reply",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Retro Loom\n\nHi Zoe,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0272"
     },
     {
       "lead_key": "lead:L0293",
@@ -5210,7 +5426,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Velvet Loom\n\nHi Zoe,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0293"
     },
     {
       "lead_key": "lead:L0273",
@@ -5234,7 +5451,8 @@
       "notes": "follows competitor",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for House of Society\n\nHi Lukas,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0273"
     },
     {
       "lead_key": "lead:L0277",
@@ -5258,7 +5476,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Atelier Trunk\n\nHi Sven,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0277"
     },
     {
       "lead_key": "lead:L0213",
@@ -5282,7 +5501,8 @@
       "notes": "price sensitive",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Second Threads\n\nHi Pablo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0213"
     },
     {
       "lead_key": "lead:L0177",
@@ -5306,7 +5526,8 @@
       "notes": "ref from supplier",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Loft Bazaar\n\nHi Mia,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0177"
     },
     {
       "lead_key": "lead:L0291",
@@ -5330,7 +5551,8 @@
       "notes": "high engagement acct",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for The Loom\n\nHi Theo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0291"
     },
     {
       "lead_key": "lead:L0279",
@@ -5354,7 +5576,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Corner Collective\n\nHi Liam,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0279"
     },
     {
       "lead_key": "lead:L0284",
@@ -5378,7 +5601,8 @@
       "notes": "wants menswear focus",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Maison Lab\n\nHi Hugo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0284"
     },
     {
       "lead_key": "lead:L0289",
@@ -5402,7 +5626,8 @@
       "notes": "met at market",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Atelier Lab\n\nHi Pablo,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0289"
     },
     {
       "lead_key": "lead:L0292",
@@ -5426,7 +5651,8 @@
       "notes": null,
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Vintage Closet\n\nHi Aisha,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0292"
     },
     {
       "lead_key": "lead:L0266",
@@ -5450,7 +5676,8 @@
       "notes": "slow to reply",
       "action_type": "email_intro",
       "message_draft": "Subject: Wholesale vintage supply for Camden Lab\n\nHi Bea,\n\nWe supply wholesale vintage stock planned around your shop's calendar, so restocking doesn't depend on luck. Would you be open to a short call this week to see if it's a fit?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0266"
     },
     {
       "lead_key": "lead:L0252",
@@ -5474,7 +5701,8 @@
       "notes": "slow to reply",
       "action_type": "visit",
       "message_draft": "VISIT - Rusty Wardrobe (Amsterdam): In-person visit to show sample stock and agree a first order. Pair with other Amsterdam visits this week to make the trip worth it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0188,L0252"
     },
     {
       "lead_key": "lead:L0204",
@@ -5498,7 +5726,8 @@
       "notes": null,
       "action_type": "call",
       "message_draft": "CALL SCRIPT - House of Drawer (Leeds): Confirm interest in stocking up via Fleek, agree next step (sample bundle or visit). Last note from them: \"We already sell on Vinted.\".",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0204"
     },
     {
       "lead_key": "lead:L0157",
@@ -5522,7 +5751,8 @@
       "notes": "owner travels a lot",
       "action_type": "visit",
       "message_draft": "VISIT - Atelier Drawer (Bristol): In-person visit to show sample stock and agree a first order. Pair with other Bristol visits this week to make the trip worth it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0157"
     },
     {
       "lead_key": "lead:L0198",
@@ -5546,7 +5776,8 @@
       "notes": "ref from supplier",
       "action_type": "visit",
       "message_draft": "VISIT - Loft Lab (Paris): In-person visit to show sample stock and agree a first order. Pair with other Paris visits this week to make the trip worth it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0198"
     },
     {
       "lead_key": "lead:L0239",
@@ -5570,7 +5801,8 @@
       "notes": "met at market",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for The Rail\n\nHi Tom,\n\nGreat, let's lock in a time - what works for you this week?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0239"
     },
     {
       "lead_key": "lead:L0215",
@@ -5594,7 +5826,8 @@
       "notes": "met at market",
       "action_type": "visit",
       "message_draft": "VISIT - Corner Bazaar (Amsterdam): In-person visit to show sample stock and agree a first order. Pair with other Amsterdam visits this week to make the trip worth it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0215"
     },
     {
       "lead_key": "lead:L0193",
@@ -5618,7 +5851,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0193"
     },
     {
       "lead_key": "lead:L0192",
@@ -5642,7 +5876,8 @@
       "notes": "ref from supplier",
       "action_type": "visit",
       "message_draft": "VISIT - Camden Exchange (Paris): In-person visit to show sample stock and agree a first order. Pair with other Paris visits this week to make the trip worth it.",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0192"
     },
     {
       "lead_key": "lead:L0194",
@@ -5666,7 +5901,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0194"
     },
     {
       "lead_key": "lead:L0229",
@@ -5690,7 +5926,8 @@
       "notes": "slow to reply",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for Corner Trunk\n\nHi Lukas,\n\nGood question, there's a bit of detail to it. Tell me what's easier: a quick call, or I email over the specifics?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0229"
     },
     {
       "lead_key": "lead:L0180",
@@ -5714,7 +5951,8 @@
       "notes": "big consignment potential",
       "action_type": "call",
       "message_draft": "CALL SCRIPT - Old Collective (Paris): Confirm interest in stocking up via Fleek, agree next step (sample bundle or visit). Last note from them: \"Owner is back next week, call then.\".",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0180"
     },
     {
       "lead_key": "lead:L0205",
@@ -5738,7 +5976,8 @@
       "notes": "high engagement acct",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0205"
     },
     {
       "lead_key": "lead:L0220",
@@ -5762,7 +6001,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0220"
     },
     {
       "lead_key": "lead:L0190",
@@ -5786,7 +6026,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0190"
     },
     {
       "lead_key": "lead:L0226",
@@ -5810,7 +6051,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0226"
     },
     {
       "lead_key": "lead:L0217",
@@ -5834,7 +6076,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0217"
     },
     {
       "lead_key": "lead:L0153",
@@ -5858,7 +6101,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0153"
     },
     {
       "lead_key": "lead:L0178",
@@ -5882,7 +6126,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0178"
     },
     {
       "lead_key": "lead:L0155",
@@ -5906,7 +6151,8 @@
       "notes": "price sensitive",
       "action_type": "email_followup",
       "message_draft": "Subject: Re: wholesale supply for The Exchange\n\nHi Ines,\n\nTotally fair, no pressure. Worth keeping the door open in case timing shifts - happy to check back in a few weeks?\n\nBest,\nFleek",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0155"
     },
     {
       "lead_key": "lead:L0181",
@@ -5930,7 +6176,8 @@
       "notes": "price sensitive",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0181"
     },
     {
       "lead_key": "lead:L0202",
@@ -5954,7 +6201,8 @@
       "notes": "wants menswear focus",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0202"
     },
     {
       "lead_key": "lead:L0156",
@@ -5978,7 +6226,8 @@
       "notes": "follows competitor",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0156"
     },
     {
       "lead_key": "lead:L0154",
@@ -6002,7 +6251,8 @@
       "notes": "slow to reply",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0154"
     },
     {
       "lead_key": "lead:L0196",
@@ -6026,7 +6276,8 @@
       "notes": "slow to reply",
       "action_type": "call",
       "message_draft": "CALL SCRIPT - Golden Collective (Paris): Confirm interest in stocking up via Fleek, agree next step (sample bundle or visit). Last note from them: \"Owner is back next week, call then.\".",
-      "queued_today": true
+      "queued_today": true,
+      "source_lead_ids": "L0196"
     },
     {
       "lead_key": "lead:L0175",
@@ -6050,7 +6301,8 @@
       "notes": null,
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0175"
     },
     {
       "lead_key": "lead:L0169",
@@ -6074,7 +6326,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0169"
     },
     {
       "lead_key": "lead:L0172",
@@ -6098,7 +6351,8 @@
       "notes": "ref from supplier",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0172"
     },
     {
       "lead_key": "lead:L0184",
@@ -6122,7 +6376,8 @@
       "notes": "owner travels a lot",
       "action_type": null,
       "message_draft": null,
-      "queued_today": false
+      "queued_today": false,
+      "source_lead_ids": "L0184"
     }
   ],
   "visit_plan": [
@@ -6582,5 +6837,93 @@
     "email": 150,
     "call": 30,
     "visit": 5
-  }
+  },
+  "import_history": [
+    {
+      "batch_label": "day2",
+      "ingested_at": "2026-06-25T19:56:06.301428+00:00",
+      "rows_seen": 30,
+      "new_leads": 28,
+      "merged_leads": 2,
+      "merged_lead_details": [
+        {
+          "name": "heritagefinds",
+          "source_lead_ids": "L0130,L0295"
+        },
+        {
+          "name": "driftarchive",
+          "source_lead_ids": "L0073,L0294"
+        }
+      ]
+    },
+    {
+      "batch_label": "initial_handover",
+      "ingested_at": "2026-06-25T19:56:05.578149+00:00",
+      "rows_seen": 265,
+      "new_leads": 250,
+      "merged_leads": 15,
+      "merged_lead_details": [
+        {
+          "name": "Second Threads",
+          "source_lead_ids": "L0152,L0258"
+        },
+        {
+          "name": "marrowgrail_uk",
+          "source_lead_ids": "L0003,L0251"
+        },
+        {
+          "name": "embermarrowco",
+          "source_lead_ids": "L0061,L0265"
+        },
+        {
+          "name": "Velvet Trunk",
+          "source_lead_ids": "L0165,L0255"
+        },
+        {
+          "name": "sableshop",
+          "source_lead_ids": "L0015,L0263"
+        },
+        {
+          "name": "emberco",
+          "source_lead_ids": "L0115,L0264"
+        },
+        {
+          "name": "Past Cellar",
+          "source_lead_ids": "L0224,L0254"
+        },
+        {
+          "name": "emberfadedsupply",
+          "source_lead_ids": "L0002,L0261"
+        },
+        {
+          "name": "Vintage Closet",
+          "source_lead_ids": "L0240,L0260"
+        },
+        {
+          "name": "Past Lane",
+          "source_lead_ids": "L0151,L0259"
+        },
+        {
+          "name": "Rusty Wardrobe",
+          "source_lead_ids": "L0188,L0252"
+        },
+        {
+          "name": "Rusty Cellar",
+          "source_lead_ids": "L0176,L0256"
+        },
+        {
+          "name": "giltgiltgallery",
+          "source_lead_ids": "L0120,L0253"
+        },
+        {
+          "name": "reworkedstaticfinds",
+          "source_lead_ids": "L0021,L0262"
+        },
+        {
+          "name": "tonicfadedstudio",
+          "source_lead_ids": "L0080,L0257"
+        }
+      ]
+    }
+  ]
 }

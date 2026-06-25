@@ -97,6 +97,55 @@
   }
   .stat-tag b { font-family: var(--stencil); font-size: 16px; font-weight: 600; color: var(--denim); }
 
+  .actions-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .action-link {
+    font-family: var(--stencil);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    background: var(--denim);
+    border-radius: var(--radius);
+    padding: 9px 16px;
+    display: inline-block;
+  }
+  .action-link:hover { background: var(--denim-soft); }
+  .how-it-works {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 10px 0 0;
+  }
+
+  .import-history {
+    margin-top: 16px;
+    border-top: 1px dashed var(--line);
+    padding-top: 12px;
+  }
+  .import-history-title {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--ink-soft); margin-bottom: 8px;
+  }
+  .import-row {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;
+    font-family: var(--mono); font-size: 12px;
+    padding: 4px 0;
+  }
+  .import-row .batch { color: var(--ink); font-weight: 500; flex: none; min-width: 140px; }
+  .import-row .stamp { color: var(--ink-soft); flex: none; }
+  .import-row .counts { color: var(--olive); }
+  .merge-detail {
+    flex-basis: 100%;
+    color: var(--ink-soft);
+    font-size: 11px;
+    padding-left: 150px;
+  }
+  @media (max-width: 600px) {
+    .merge-detail { padding-left: 0; }
+  }
+
   /* ---- tabs ---- */
   nav.tabs {
     display: flex; gap: 2px; margin-bottom: 14px;
@@ -241,6 +290,13 @@
     font-style: italic; color: var(--ink-soft); font-size: 12.5px;
     border-left: 2px solid var(--line); padding-left: 8px; margin: 6px 0;
   }
+  .merged-note {
+    font-size: 12px; color: var(--olive);
+    background: rgba(92,122,82,0.1);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    margin: 8px 0;
+  }
 
   .queued-flag {
     font-family: var(--mono); font-size: 10.5px;
@@ -284,7 +340,14 @@
         <strong id="timestampLine">&mdash;</strong>
       </div>
     </div>
+    <div class="actions-row">
+      <a class="action-link" href="https://github.com/CalemT/fleek-pipeline-tool/upload/main/data/incoming" target="_blank" rel="noopener">+ Add new leads</a>
+      <a class="action-link" href="https://github.com/CalemT/fleek-pipeline-tool/actions/workflows/daily_plan.yml" target="_blank" rel="noopener">&#9654; Run today's plan</a>
+    </div>
+    <p class="how-it-works">Drop a new lead file in with "Add new leads," click "Run today's plan,"
+      and this page updates on its own within a minute or two - no terminal needed.</p>
     <div class="stat-row" id="statRow"></div>
+    <div id="importHistory"></div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -360,6 +423,12 @@ function leadRow(lead, idx, prefix) {
           ${lead.email ? `<div><dt>Email</dt><dd>${escapeHtml(lead.email)}</dd></div>` : ''}
           ${lead.phone ? `<div><dt>Phone</dt><dd>${escapeHtml(lead.phone)}</dd></div>` : ''}
         </dl>
+        ${(() => {
+          const ids = (lead.source_lead_ids || '').split(',').filter(Boolean);
+          return ids.length > 1
+            ? `<p class="merged-note">Originally listed as ${ids.length} separate records (${ids.join(', ')}) - merged automatically because they share the same email, phone, or handle.</p>`
+            : '';
+        })()}
         ${lead.last_inbound_text ? `<p class="inbound">&ldquo;${escapeHtml(lead.last_inbound_text)}&rdquo;</p>` : ''}
         ${lead.message_draft ? `
           <div class="draft-label">Drafted ${escapeHtml(lead.action_type)}</div>
@@ -432,6 +501,28 @@ async function init() {
   document.getElementById('panel-instagram').innerHTML = renderList(data.instagram, 'ig');
   document.getElementById('panel-stores').innerHTML = renderList(data.stores, 'st');
   document.getElementById('panel-visits').innerHTML = renderVisitPlan(data.visit_plan);
+
+  const history = data.import_history || [];
+  if (history.length) {
+    const rows = history.map(h => {
+      const when = new Date(h.ingested_at).toUTCString().replace(' GMT', ' UTC');
+      const merges = (h.merged_lead_details || []);
+      const mergeList = merges.length
+        ? `<div class="merge-detail">merged: ${merges.map(m => escapeHtml(m.name)).join(', ')}</div>`
+        : '';
+      return `<div class="import-row">
+        <span class="batch">${escapeHtml(h.batch_label)}</span>
+        <span class="stamp">${when}</span>
+        <span class="counts">${h.new_leads} new, ${h.merged_leads} merged (of ${h.rows_seen} rows)</span>
+        ${mergeList}
+      </div>`;
+    }).join('');
+    document.getElementById('importHistory').innerHTML =
+      `<div class="import-history">
+         <div class="import-history-title">Recent imports</div>
+         ${rows}
+       </div>`;
+  }
 }
 
 init();
