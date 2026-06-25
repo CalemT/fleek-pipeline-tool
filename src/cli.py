@@ -518,6 +518,77 @@ def cmd_backlog_forecast(args):
     conn.close()
 
 
+def cmd_visit_plan(args):
+    """The brief asks specifically to 'group [stores] by city so you can
+    book the most shop visits in a week' - the daily store CSV sorts by
+    city, but a sort isn't a decision. This is the actual decision: which
+    cities have enough visit-ready stores to justify a dedicated trip this
+    week, vs which should keep being called until more accumulate there.
+    A single store in a city probably isn't worth flying out for; five is."""
+    today = date.today()
+    conn = db.connect(args.db)
+    leads = conn.execute(
+        "SELECT * FROM leads WHERE channel='direct' AND stage NOT IN ('won','lost')"
+    ).fetchall()
+
+    visit_ready = []
+    for lead in leads:
+        tier, score = scoring.score_lead(lead, today)
+        if tier is None:
+            continue
+        action_type = drafting.next_action_type(lead, tier)
+        if action_type == "visit":
+            visit_ready.append((lead, score))
+
+    by_city = {}
+    for lead, score in visit_ready:
+        city = lead["city"] or "(unknown city)"
+        by_city.setdefault(city, []).append((lead, score))
+
+    min_cluster = cfg.load_config()["min_visit_cluster"]
+    visit_cap = cfg.load_config()["daily_caps"]["visit"]
+
+    worthy = {c: leads_ for c, leads_ in by_city.items() if len(leads_) >= min_cluster}
+    not_yet = {c: leads_ for c, leads_ in by_city.items() if len(leads_) < min_cluster}
+
+    print(f"[visit-plan] {len(visit_ready)} stores are visit-ready across {len(by_city)} cities "
+          f"(need {min_cluster}+ in a city to justify a dedicated trip)")
+    print()
+    if worthy:
+        print("BOOK THIS WEEK:")
+        for city, leads_ in sorted(worthy.items(), key=lambda kv: -len(kv[1])):
+            days_needed = -(-len(leads_) // visit_cap)  # ceil division
+            print(f"  {city}: {len(leads_)} stores ready -> ~{days_needed} day(s) of visits "
+                  f"at {visit_cap}/day cap")
+    else:
+        print("BOOK THIS WEEK: nothing meets the threshold yet.")
+    print()
+    if not_yet:
+        print("NOT YET WORTH A DEDICATED TRIP (keep calling until more accumulate):")
+        for city, leads_ in sorted(not_yet.items(), key=lambda kv: -len(kv[1])):
+            print(f"  {city}: {len(leads_)} store(s)")
+
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    rows = []
+    for city, leads_ in by_city.items():
+        for lead, score in leads_:
+            rows.append({
+                "city": city, "trip_worthy": city in worthy,
+                "store_name": lead["store_name"], "contact_name": lead["contact_name"],
+                "phone": lead["phone"], "email": lead["email"],
+                "score": round(score, 1), "num_touches": lead["num_touches"],
+            })
+    rows.sort(key=lambda r: (not r["trip_worthy"], r["city"], -r["score"]))
+    if rows:
+        path = OUTPUT_DIR / "visit_plan.csv"
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+        print(f"\n-> {path}")
+    conn.close()
+
+
 def main():
     p = argparse.ArgumentParser(description="Fleek pipeline outreach tool")
     p.add_argument("--db", default=DB_PATH)
@@ -574,6 +645,9 @@ def main():
 
     p_backlog = sub.add_parser("backlog-forecast", help="Estimate days to clear the current backlog at today's caps")
     p_backlog.set_defaults(func=cmd_backlog_forecast)
+
+    p_visit = sub.add_parser("visit-plan", help="Decide which cities have enough visit-ready stores for a dedicated trip")
+    p_visit.set_defaults(func=cmd_visit_plan)
 
     args = p.parse_args()
     args.func(args)

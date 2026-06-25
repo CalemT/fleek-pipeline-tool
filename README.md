@@ -75,6 +75,23 @@ desktop app is open (it catches up on wake if you miss a run), so it's a
 good complement to the GitHub Actions workflow for visibility, not a
 replacement for the part that needs to run with zero dependencies.
 
+## Grouping stores by city for visits - a real decision, not just a sort
+
+The daily store CSV sorts by city so same-city leads sit together, but a
+sort isn't a decision. `python -m src.cli visit-plan` is the actual
+decision the brief asks for: which cities have enough visit-ready stores
+(`min_visit_cluster` in `config/assumptions.yaml`, default 3) to justify
+booking a dedicated trip this week, versus which should stay on calls until
+more accumulate there. Outputs a clear "book this week" vs "not yet"
+breakdown plus `output/visit_plan.csv` with real contact details, sorted
+trip-worthy cities first.
+
+Also fixed while building this: the email->call->visit escalation ladder
+previously only ever reached "visit" for the `re_engage` (ghosted) tier -
+a store stuck in `follow_up_due` could be called indefinitely and never
+escalate, which contradicted the brief's literal sequence for *any*
+unresponsive store. Both tiers now share one ladder, keyed on touch count.
+
 ## Will this actually keep up at scale?
 
 `python -m src.cli backlog-forecast` answers this directly instead of

@@ -62,14 +62,23 @@ def next_action_type(lead, tier: str) -> str:
             "re_engage": "dm_reengage",
         }[tier]
 
-    # direct (store) channel: email -> call -> visit
+    # direct (store) channel: email -> call -> visit, escalating by how many
+    # times we've already tried. Previously this only escalated to "visit"
+    # for the re_engage (ghosted) tier specifically - a store stuck in
+    # follow_up_due could be called forever and never escalate, which
+    # contradicts the brief's literal sequence ("email, then a call, then a
+    # visit") for ANY unresponsive store, not just ones formally ghosted.
     if tier == "waiting_on_us":
         return "call_confirm" if stage == "call_booked" else "email_followup"
     if tier == "new":
         return "email_intro"
-    if tier == "follow_up_due":
-        return "call" if touches >= 1 else "email_followup"
-    return "visit" if touches >= 2 else "call"  # re_engage
+    # follow_up_due and re_engage are both "we've reached out, no reply yet"
+    # - just different elapsed-time buckets - so they share one ladder.
+    if touches >= 2:
+        return "visit"
+    if touches >= 1:
+        return "call"
+    return "email_followup"
 
 
 def draft_message(lead, action_type: str) -> str:

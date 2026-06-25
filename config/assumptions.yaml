@@ -14,6 +14,11 @@ daily_caps:
                        # however many people actually make outbound calls
   visit: 5             # placeholder - travel-time constrained, pairs with city grouping
 
+# How many visit-ready stores a city needs before it's worth a dedicated
+# trip, vs just holding them on calls until more accumulate. Placeholder -
+# the real number depends on Fleek's actual travel budget/time per trip.
+min_visit_cluster: 3
+
 # --- Insert Fleek data here -------------------------------------------------
 # Everything below is `null` because we don't have it. Once Fleek has actual
 # channel performance numbers (from a CRM, dialer, or email tool - however

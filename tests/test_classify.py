@@ -37,3 +37,17 @@ def test_action_categories_split_correctly():
     assert drafting.ACTION_CATEGORY["call"] == "call"
     assert drafting.ACTION_CATEGORY["call_confirm"] == "call"
     assert drafting.ACTION_CATEGORY["visit"] == "visit"
+
+
+def test_store_escalation_ladder_reaches_visit_regardless_of_which_unresponsive_tier():
+    # Previously only the re_engage (ghosted) tier could ever escalate to a
+    # visit - a store stuck in follow_up_due could be called forever. Both
+    # tiers represent "reached out, no reply yet" and should share one ladder.
+    from src import drafting
+    for tier in ("follow_up_due", "re_engage"):
+        lead = {"channel": "direct", "num_touches": 0, "stage": "contacted"}
+        assert drafting.next_action_type(lead, tier) == "email_followup"
+        lead["num_touches"] = 1
+        assert drafting.next_action_type(lead, tier) == "call"
+        lead["num_touches"] = 2
+        assert drafting.next_action_type(lead, tier) == "visit"
