@@ -15,5 +15,6 @@ echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) ===" >> logs/daily.log
 
 python3 -m src.cli auto-ingest --folder data/incoming 2>&1 | tee -a logs/daily.log
 python3 -m src.cli plan --date "$(date -u +%Y-%m-%d)" 2>&1 | tee -a logs/daily.log
+python3 -m src.cli visit-plan 2>&1 | tee -a logs/daily.log
 
 echo "Done. See output/ for today's CSVs." | tee -a logs/daily.log
