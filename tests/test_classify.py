@@ -51,3 +51,38 @@ def test_store_escalation_ladder_reaches_visit_regardless_of_which_unresponsive_
         assert drafting.next_action_type(lead, tier) == "call"
         lead["num_touches"] = 2
         assert drafting.next_action_type(lead, tier) == "visit"
+
+
+def test_draft_message_never_calls_a_reseller_a_shop():
+    # A reseller who happens to be on the direct (email/phone) channel
+    # doesn't have a "shop" - the fallback should use their real handle,
+    # not generic store language that's wrong for who they actually are.
+    from src import drafting
+    lead = {"contact_name": "Marcus", "store_name": None, "handle": "staticvintage",
+            "active_listings": None, "sales_velocity_30d": None,
+            "last_inbound_text": None, "city": None, "segment": "full_time_reseller"}
+    msg = drafting.draft_message(lead, "email_followup")
+    assert "your shop" not in msg
+    assert "@staticvintage" in msg
+
+
+def test_dm_cold_fallback_never_calls_an_instagram_reseller_a_shop():
+    # Same bug, different function: the dm_cold cold-open's defensive
+    # fallback (only reachable if segment is somehow unset) previously said
+    # "your shop" - an Instagram-only reseller has a page, not a shop.
+    from src import drafting
+    lead = {"segment": None, "active_listings": None, "sales_velocity_30d": None,
+            "contact_name": None, "store_name": None, "handle": "somehandle",
+            "last_inbound_text": None, "city": None}
+    msg = drafting.draft_message(lead, "dm_cold")
+    assert "your shop" not in msg
+
+
+def test_draft_message_falls_back_to_neutral_when_no_identifier_at_all():
+    from src import drafting
+    lead = {"contact_name": None, "store_name": None, "handle": None,
+            "active_listings": None, "sales_velocity_30d": None,
+            "last_inbound_text": None, "city": None, "segment": None}
+    msg = drafting.draft_message(lead, "email_followup")
+    assert "your account" in msg
+    assert "your shop" not in msg

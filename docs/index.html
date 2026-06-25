@@ -249,6 +249,15 @@
     flex: none;
   }
 
+  .type-badge {
+    font-family: var(--mono); font-size: 10.5px;
+    padding: 2px 6px; border-radius: var(--radius);
+    flex: none;
+    border: 1px solid currentColor;
+  }
+  .type-badge.store { color: var(--denim); }
+  .type-badge.reseller { color: var(--ink-soft); }
+
   footer {
     text-align: center; font-family: var(--mono); font-size: 11.5px;
     color: var(--ink-soft); margin-top: 40px;
@@ -312,15 +321,29 @@ function fmtMoney(v) {
 function leadRow(lead, idx, prefix) {
   const id = `${prefix}-${idx}`;
   const name = lead.store_name || lead.handle || lead.contact_name || '(unnamed)';
-  const sub = lead.store_name && lead.handle ? '@' + lead.handle
-            : lead.city ? lead.city : '';
+  // City and handle are two separate facts and should never silently
+  // replace each other - a hybrid lead (has both a shop name and a handle)
+  // should show both, not whichever one happened to win a ternary.
+  const subParts = [];
+  if (lead.city) subParts.push(escapeHtml(lead.city));
+  if (lead.store_name && lead.handle) subParts.push('@' + escapeHtml(lead.handle));
+  const sub = subParts.join(' &middot; ');
   const queuedBadge = lead.queued_today ? `<span class="queued-flag">QUEUED TODAY</span>` : '';
+  // This row's channel (which tab it's in) is how we CONTACT this lead -
+  // it is not the same thing as what they actually ARE. A reseller can
+  // still land in the "Store Outreach" tab just because they happen to
+  // have an email on file. This badge makes that explicit instead of
+  // leaving someone to guess from a blank subtitle line.
+  const typeBadge = lead.lead_type
+    ? `<span class="type-badge ${lead.lead_type}">${lead.lead_type === 'store' ? 'Business' : 'Reseller'}</span>`
+    : '';
 
   return `
     <li class="lead">
       <button class="lead-row" aria-expanded="false" aria-controls="${id}" onclick="toggleLead('${id}')">
         <span class="dot ${lead.tier}" title="${TIER_LABEL[lead.tier] || lead.tier}"></span>
-        <span class="lead-name">${escapeHtml(name)}${sub ? `<span class="sub">${escapeHtml(sub)}</span>` : ''}</span>
+        <span class="lead-name">${escapeHtml(name)}${sub ? `<span class="sub">${sub}</span>` : ''}</span>
+        ${typeBadge}
         ${queuedBadge}
         <span class="lead-meta">${TIER_LABEL[lead.tier] || lead.tier} &middot; ${escapeHtml(lead.action_type || '')}</span>
         <span class="lead-score">${lead.score}</span>

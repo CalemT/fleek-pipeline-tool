@@ -83,7 +83,11 @@ def next_action_type(lead, tier: str) -> str:
 
 def draft_message(lead, action_type: str) -> str:
     name = _greeting(lead)
-    store = lead["store_name"] or "your shop"
+    # "your shop" is wrong for a reseller who happens to be on the direct
+    # (email/phone) channel - they don't have a shop, they have a handle.
+    # Use whatever real identifier exists rather than defaulting to
+    # store-specific language for every lead.
+    place = lead["store_name"] or (f"@{lead['handle']}" if lead["handle"] else "your account")
     listings = int(lead["active_listings"]) if lead["active_listings"] else None
     velocity = int(lead["sales_velocity_30d"]) if lead["sales_velocity_30d"] else None
     last_text = lead["last_inbound_text"]
@@ -93,7 +97,7 @@ def draft_message(lead, action_type: str) -> str:
         hook = SEGMENT_HOOK.get(lead["segment"])
         if not hook:
             hook = (f"saw you've got {listings} live listings and moving ~{velocity}/month"
-                    if listings and velocity else "saw your shop and love the edit")
+                    if listings and velocity else "saw your page and love the edit")
         return (f"Hey! We supply vintage/secondhand stock in bulk (100+ pieces at a time) "
                 f"so resellers don't have to source piece-by-piece - {hook}. Worth a quick chat?")
 
@@ -110,27 +114,27 @@ def draft_message(lead, action_type: str) -> str:
 
     if action_type == "email_intro":
         hook = SEGMENT_HOOK.get(lead["segment"], "we supply wholesale vintage stock in bulk")
-        return (f"Subject: Wholesale vintage supply for {store}\n\n"
+        return (f"Subject: Wholesale vintage supply for {place}\n\n"
                 f"Hi {name},\n\n{hook[0].upper() + hook[1:]}. Would you be open to a "
                 f"short call this week to see if it's a fit?\n\nBest,\nFleek")
 
     if action_type == "email_followup":
         ref = f' You mentioned: "{last_text}".' if last_text else ""
-        return (f"Subject: Re: wholesale supply for {store}\n\n"
+        return (f"Subject: Re: wholesale supply for {place}\n\n"
                 f"Hi {name},\n\nFollowing up on our last chat.{ref} Keen to find a time this "
                 f"week to move things forward - does a quick call work?\n\nBest,\nFleek")
 
     if action_type == "call":
         ref = f' Last note from them: "{last_text}".' if last_text else ""
-        return (f"CALL SCRIPT - {store} ({city}): Confirm interest in stocking up via "
+        return (f"CALL SCRIPT - {place} ({city}): Confirm interest in stocking up via "
                 f"Fleek, agree next step (sample bundle or visit).{ref}")
 
     if action_type == "call_confirm":
-        return (f"CALL SCRIPT - {store} ({city}): Confirm the booked call time and agenda; "
+        return (f"CALL SCRIPT - {place} ({city}): Confirm the booked call time and agenda; "
                 f"come ready to agree a first order.")
 
     if action_type == "visit":
-        return (f"VISIT - {store} ({city}): In-person visit to show sample stock and agree "
+        return (f"VISIT - {place} ({city}): In-person visit to show sample stock and agree "
                 f"a first order. Pair with other {city} visits this week to make the trip worth it.")
 
     return "Review lead manually."
