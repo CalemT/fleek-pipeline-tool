@@ -1,84 +1,70 @@
-# How AI was used to build this
+# How AI Was Used
 
-*(Draft based on the actual build session - personalize this before you submit it, since you'll be asked to speak to it directly in the debrief.)*
+**Tool:** Claude (chat) - not Claude Code or Cursor. No autonomous agent
+loop; a long, direct conversation with shell/file access, where every
+significant decision was reviewed, questioned, or redirected before being
+treated as final.
 
-**Tool:** Claude (chat), used conversationally rather than Claude Code/Cursor
-- no IDE agent loop, just iterating in a chat session with direct shell/file
-access to inspect the data and write/run/fix code.
+This file is the short version. **`DEVELOPMENT_LOG.md` is the complete,
+dated record** of every real issue found during the build, how it was
+found, and how it was fixed - read that for the full picture. The honest
+summary of the pattern across all of it:
 
-## What it was used for
+## What AI was used for
 
-- **Exploring the messy data before writing any code.** Rather than guessing
-  at the dirtiness, every cleaning rule in `src/clean.py` and `src/classify.py`
-  came from actually querying the spreadsheet first: counting stage-label
-  variants, checking which "reseller" rows had an email, checking whether
-  `followers` was ever genuinely populated on store rows (it wasn't - it's a
-  placeholder `0`), and confirming duplicate entities by email/phone/handle
-  before deciding the merge key. The classification rule ("channel = what
-  contact info actually exists, not the source label") came directly out of
-  that inspection, not a guess.
-- **Writing the cleaning / dedup / scoring / drafting code.** Most of the
-  module code was written by Claude based on a spec worked out in
-  conversation, then run immediately against the real data to check the
-  output counts made sense (e.g. confirming dedup collapsed exactly the
-  duplicate clusters found during inspection, confirming the channel split
-  roughly matched the README's stated 60/40).
-- **Catching a real performance bug.** The first version of `ingest.py`
-  matched each new row against the database with a per-row SQL query
-  (including a `substr()` scan for phone matching). It worked fine on 265
-  rows. Running the 30k-row scale test exposed it taking 54 seconds - too
-  slow to credibly claim "still works at 30,000." Claude diagnosed the
-  per-row table scan as the cause and rewrote matching around an in-memory
-  index built once per ingest, which brought it down to ~9.5s. This is the
-  kind of thing that's easy to miss without actually generating a large
-  synthetic batch and timing it, which is why `tests/scale_test.py` exists
-  as a real check rather than just a comment claiming it scales.
-- **Researching Fleek's actual business, not just generic B2B lead-scoring
-  theory.** The first pass at the scoring rubric was built on generic B2B
-  SaaS lead-scoring research (content downloads, job titles, company size -
-  the most common results for that search). That's a weak foundation for a
-  company whose customers aren't a software buying committee. Fetching
-  joinfleek.com directly surfaced something much more useful: Fleek
-  explicitly markets to three named customer segments (New Reseller,
-  Full-Time Reseller, Business/shops), each with a different pitch. That's
-  now reflected in `classify.py` (`classify_segment`) and in the drafted
-  messages themselves (`drafting.py`'s `SEGMENT_HOOK`), instead of one
-  generic template for every reseller.
-- **Catching a real factual error by going to the source.** Re-reading the
-  case study brief alongside the actual website surfaced that several of
-  the first-draft message templates had the transaction backwards - they
-  read as "we want to buy your stock," when the brief is explicit
-  ("we sell to two very different kinds of lead") and the website confirms
-  it: Fleek supplies wholesale vintage *to* resellers/shops, who resell it
-  individually. This is the kind of mistake that's easy to make by pattern-
-  matching the word "buying" in the brief's own example sentence ("you are
-  buying 100 t-shirts... instead of one") without checking which party is
-  doing the buying in *this* pipeline - and exactly why checking generated
-  output against the primary source (the company's own site, not just the
-  brief) matters before treating AI output as correct.
-- **Writing tests and the architecture diagram/doc.**
+Writing essentially all the code (cleaning, entity resolution, scoring,
+drafting, the CLI, the GitHub Pages dashboard); running real research when
+specifically asked to (Fleek's actual website and customer segments, B2B
+lead-scoring practice, signs of AI-generated writing, sales
+objection-handling technique); building and running the test suite;
+debugging issues live, including ones that only surfaced after deploying
+to GitHub Actions.
 
-## Where it sped things up
+## Where it genuinely sped things up
 
-Mainly the boring-but-essential parts: surveying every messy field
-combination across 265+30 rows by hand would be slow and error-prone;
-writing the cleaning/normalization functions, the CLI plumbing, and the
-test scaffolding from a clear spec is exactly what AI is fast at.
+The boring-but-essential parts: surveying every messy field combination
+across 295 real rows by hand would be slow; writing the
+cleaning/scoring/CLI/dashboard code from a clear spec is exactly what AI
+is fast at. Also fast at running real, falsifiable tests - executing the
+actual dashboard JavaScript against real exported data via Node, or
+simulating 15 days of plan+send cycles at 30,000-lead scale to check for
+performance degradation over time, rather than just asserting things work.
 
-## Where it needed a human call
+## Where it got things wrong, and - importantly - how that got caught
 
-- **The prioritization rubric itself is a business judgement, not something
-  to default to.** Deciding that "waiting on us" always outranks a bigger
-  but cold new lead, and what the cooldown windows should be by channel/stage,
-  are calls about how Fleek's reps actually work - they came from reasoning
-  through the brief's own framing ("a lot of these leads are sitting
-  half-replied... getting those going again is most of the job"), not from
-  an AI default.
-- **Message tone.** The drafted templates are deliberately plain and
-  short - a human should still skim before anything goes out, especially on
-  Instagram where a tone that reads as spammy risks the account, not just
-  the lead.
-- **Anything client-facing should be sanity-checked against the actual
-  conversation history** (`last_inbound_text`) before sending - the draft
-  references it, but doesn't reason about *what kind of reply it actually
-  needs*, which is a step I read manually for the live walkthrough.
+AI's first pass at almost everything needed a harder second look, and
+that second look came from direct, specific questioning, not from AI
+reviewing its own output:
+
+- The first scoring research was generic B2B SaaS advice - irrelevant to
+  this business. Caught by being asked directly whether it was actually
+  relevant, which led to reading joinfleek.com properly.
+- That same pass produced a real factual error: several message drafts
+  had the transaction backwards. Caught by re-reading the brief's own
+  wording against the live site - not spotted by AI re-checking itself.
+- A real bug (leads stuck in a no-cooldown tier forever, silently
+  starving the rest of the daily queue) was only found by actually
+  simulating multiple days of sends and watching the queue fail to
+  rotate - not by code review.
+- The most significant content bug - drafted replies that quoted a
+  lead's message back inside one fixed wrapper sentence regardless of
+  what they'd actually said - was caught by reading two real examples
+  side-by-side with what was sent and asking whether it made sense as a
+  reply. That question led to real research (AI-writing tells, B2B
+  objection-handling practice) and a properly tested fix.
+- Even after that fix shipped, it didn't visibly take effect on the live
+  site - a real production bug (a message drafted hours earlier, before
+  the fix, was correctly locked in by the tool's own no-double-messaging
+  guarantee). Found by checking the actual live result again rather than
+  assuming a passing test suite meant it worked end to end.
+
+**The honest pattern:** AI is fast at producing a plausible first draft
+and at running exhaustive, falsifiable tests once told exactly what to
+check. It does not reliably catch its own generic defaults, blind spots,
+or content-level mistakes by reviewing its own work - in this build,
+nearly every meaningful fix traces back to a specific, sometimes blunt
+question, not to AI self-correction. That's worth being honest about
+rather than dressing up as something more automatic than it was.
+
+See `DEVELOPMENT_LOG.md` for the complete trail, and `DEBRIEF_PREP.md`
+for how this connects directly to the debrief's three required questions.

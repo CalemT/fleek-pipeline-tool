@@ -8,7 +8,17 @@ what every other lead's next action is, drafts the actual message, and
 re-runs safely every day without re-messaging anyone.
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for how the pieces fit together,
-and [`AI_USAGE.md`](AI_USAGE.md) for how this was built.
+and [`AI_USAGE.md`](AI_USAGE.md) for how this was built. Two more worth
+reading for the full picture:
+
+- **[`DEBRIEF_PREP.md`](DEBRIEF_PREP.md)** - the detailed mechanics of how
+  scoring works, how the 40 daily Instagram DMs actually get picked (with
+  real numbers from running it), how this scales to 30,000 leads, and how
+  the two lead types are handled differently.
+- **[`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)** - a dated, honest record
+  of every real bug found while building this, how it was found, and how
+  it was fixed - including a production issue that only showed up after
+  going live on GitHub Pages.
 
 ## Quickstart
 
