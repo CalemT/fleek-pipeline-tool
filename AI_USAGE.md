@@ -131,7 +131,11 @@ properly. That happened late, every time, after the fact.
 The better way to do this would be to ask for that kind of specific,
 company- and platform-level research right at the very start, before
 writing a single line of code, instead of finding each gap one expensive
-bug at a time as the build went on. That's the real lesson I'm taking
+bug at a time as the build went on. Also, rather than working off of the brief, 
+having a set build list on building out the back end, otpimising the front-end 
+for ease of use, and installing built in formulas to ensure continuous improvement
+as the tool runs over time, I did all of these things, but now that I understand
+the build more, I would optimise the approach.  That's the real lesson I'm taking
 into the next project, not just something I'm noting about this one.
 
 See `DEVELOPMENT_LOG.md` for the full trail, and `GTM_STRATEGY.md` for
