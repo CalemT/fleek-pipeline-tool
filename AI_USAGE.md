@@ -16,11 +16,13 @@ Fleek's own website and customer segments, how B2B teams handle
 sales objections, what makes text read as AI-written, GitHub's actual API
 rules. It also built and ran the test suite, and helped me debug things
 live once they were deployed and breaking in ways local testing
-hadn't caught.
+hadn't caught. My thoughts on AI are that you don't have to be a genius,
+you are allowed the opportunity to pull the puppet strings behind the 
+genius, understanding how to pull them correctly defines the outcome.
 
 ## Where it saved me time
 
-Mostly the parts that are tedious but not hard. Going through 295 messy
+All the months of coding and building and researching and the parts that are tedious. Going through 295 messy
 rows by hand to spot every weird date format or duplicate would have
 taken me a long time. Writing the cleaning code, the scoring code, the
 dashboard, all from a clear spec, is exactly what it's fast at. It's also
