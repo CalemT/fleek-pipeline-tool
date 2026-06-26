@@ -1,7 +1,7 @@
 # How I Used AI
 
-I built this with Claude, in a normal chat conversation, not Claude Code
-or Cursor. No autonomous agent running off on its own. I sat with it the
+I built this with Claude, in a normal chat conversation, not Claude Cowork
+or Cursor, a chat and a terminal tab for coding. No autonomous agent running off on its own. I sat with it the
 whole way through and checked everything before I accepted it.
 
 `DEVELOPMENT_LOG.md` has the full, dated record of every bug we found and
