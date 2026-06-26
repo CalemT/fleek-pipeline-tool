@@ -157,18 +157,164 @@ capacity is.** Specifically:
 
 ---
 
+## How the system improves itself over time, instead of just running the same way forever
+
+Three real mechanisms, each gated on having enough real evidence before
+they do anything - none of them guess, and none of them auto-apply
+without a human reviewing the result first:
+
+1. **Scoring weights (`recalibrate`)** - fits real weights from actual
+   won/lost outcomes via logistic regression, but only once there's a
+   statistically defensible amount of data (the standard "events per
+   variable" rule of thumb - roughly 10 outcomes per feature). Today that
+   threshold isn't met (9 won leads against a ~70-needed bar for 7
+   features), so it correctly refuses and says exactly how much more data
+   is needed, rather than fitting something unreliable. Verified this
+   actually works, not just looks plausible, by deliberately seeding 300
+   synthetic outcomes with a known spend-predicts-winning relationship and
+   confirming it recovered that relationship correctly once the threshold
+   was met.
+2. **Quick sanity check (`calibration`)** - a lighter, dependency-free
+   check that doesn't fit anything: it compares the average score a lead
+   had at the moment it was actually actioned against whether that lead
+   went on to win or lose. If high scores aren't actually correlating with
+   wins once there's enough data, that's the signal the rubric itself
+   needs revisiting, not just more data.
+3. **Channel capacity (`rebalance-caps`)** - once real conversion-rate
+   data exists per channel (`channel_performance` in
+   `config/assumptions.yaml` - currently placeholders), recommends
+   shifting daily capacity toward whichever channel is actually converting
+   best, instead of the default assumption that all capacity is equally
+   valuable.
+
+Two more mechanisms that aren't about getting "smarter" exactly, but do
+keep the system correct and current automatically as things change:
+
+- **`redraft`** - if the wording of a drafted message changes (a fix, a
+  tone improvement), anything not yet sent gets automatically refreshed
+  with the new wording the next time the daily job runs - and provably
+  never touches anything already sent for real.
+- **`sync-review-issues`** - every data-quality problem becomes a real
+  GitHub Issue automatically (verified live: 16 real issues created on
+  the actual repo, correctly labeled, with the right contact details and
+  flags in each one). As people resolve and close them, the data gets
+  cleaner over time, and a lead already being tracked never gets a
+  duplicate issue.
+
+And the diagnostic that ties it together: `backlog-forecast` gives the
+real number behind "is current capacity actually keeping up" - the
+trigger for deciding it's time to use `rebalance-caps`, hire, or add more
+Instagram accounts, rather than guessing.
+
+**Why all of this is rule-based and explainable rather than a black-box
+ML pipeline:** every one of these adjustments can be explained in a
+single sentence in a room, with the actual evidence behind it - a fully
+automatic model retraining itself couldn't promise that, and at this
+data volume, it would be confidently wrong more often than it would be
+usefully right.
+
+---
+
 ## The two channels: different approaches, different AI/human split
 
 | | Online resellers | Physical shops |
 |---|---|---|
 | **Contact method** | Instagram DM only (unless they happen to have an email - then they're treated as direct-contactable regardless of the source label) | Email -> call -> visit, escalating by touch count |
 | **Real constraint** | Platform-enforced 40/day per account | Human time (calls, visits) or sender deliverability (email) |
-| **What AI does end-to-end** | Cleans/dedupes the list, decides who's actually a reseller vs a store regardless of label, scores and ranks within the 40/day cap, drafts the DM - and now drafts a reply that actually responds to what they said (objection vs question vs interest), not a generic wrapper | Same cleaning/scoring, decides the email/call/visit sequence per lead, decides which cities are worth a dedicated trip, drafts the email and the call/visit briefing notes |
+| **What AI does end-to-end** | Cleans/dedupes the list, decides who's a reseller vs a store regardless of label, scores and ranks within the 40/day cap, drafts the DM - and now drafts a reply that responds to what they said (objection vs question vs interest), not a generic wrapper | Same cleaning/scoring, decides the email/call/visit sequence per lead, decides which cities are worth a dedicated trip, drafts the email and the call/visit briefing notes |
 | **Where a human (or a future agent) has to step in** | Actually sending the DM - Instagram restricts bulk-sending automation, so this is a real point where a person (or a deliberately-chosen, compliant sending tool) has to act, not the model | Email sending could be automated end-to-end (API into Gmail/an ESP); calls and visits cannot - those need an actual human until/unless Fleek makes a separate, deliberate call to use AI voice agents |
 
 The underlying logic is genuinely shared (same scoring, same tier
 priority, same idempotency, same dashboard) - what differs is the
 sequencing and the constraint each channel hits first.
+
+---
+
+## Where new leads would actually come from automatically (a researched, deliberate next step - not built)
+
+Today, new leads enter the system through a file - dropped into
+`data/incoming/` either via terminal or the dashboard's "Add new leads"
+button (GitHub's own upload page, no terminal needed). That loop is real
+and working, but it still needs a person to assemble the file. Researched
+what it would actually take to automate the *sourcing* itself, channel by
+channel, rather than guess at an answer:
+
+**Physical shops - genuinely solvable today.** Google's Places API (Text
+Search) directly supports this: a query like "vintage clothing shops in
+Manchester" returns real business names, addresses, and a place ID that
+unlocks phone numbers and opening hours - official, documented, fully
+within Google's terms of service, not scraping. Worth noting: the
+handover data's own `source` column already has rows labeled
+`google_maps` - Fleek is very likely already doing some version of this
+by hand, so automating it closes a loop that already half-exists rather
+than inventing a new one.
+
+**Online resellers - genuinely harder, for a real platform reason, not a
+Fleek-specific one.** Checked Instagram's actual API documentation rather
+than assume an answer. The finding: there is no general search or
+discovery endpoint on Instagram's official API - only Hashtag Search
+(find recent posts under a specific tag) and Business Discovery (look up
+data for an account whose handle you already know). Multiple real
+attempts to get around this via scraping have resulted in the apps doing
+it being blocked by Instagram itself. This directly validates the brief's
+own framing that online resellers are "the hard one" - it's a platform
+restriction, not a process gap.
+
+**What this means for design, if/when it gets built** - two genuinely
+different patterns, not the same treatment for both channels:
+- **Stores: a fully automatic feed.** A scheduled script queries Google
+  Places weekly, formats results into the same columns the tool already
+  expects, and drops them straight into `data/incoming/` - zero new human
+  work once it's set up.
+- **Resellers: a human-reviewed staging step.** Hashtag Search (or a
+  deliberately-chosen third-party tool - Phantombuster, Apify, and Bright
+  Data are the real names commonly used for this, each carrying a real
+  account-ban risk worth weighing openly rather than ignoring) surfaces
+  candidate accounts into a separate review file, which a person approves
+  before it's promoted into the same `data/incoming/` folder. The extra
+  step exists specifically because structured business data from Google
+  is trustworthy by default; a tag-matched Instagram post is not.
+
+**Why this isn't built tonight, specifically.** Both options need a
+brand-new, never-tested-live credential (a Google Cloud API key; a
+third-party tool account) set up the night before presenting. The
+matching/normalization logic could be written and tested with mocked
+responses the same way the GitHub Issues integration was - but the actual
+live behavior can't be verified without that real key in hand, and
+introducing one more never-live-tested integration the night before
+presenting is exactly the kind of risk this build has spent the last two
+days deliberately finding and removing, not one to introduce hours before
+it matters. This is a clearly scoped, well-understood next step, not a
+gap in understanding.
+
+---
+
+## Other places where more time or resources would change the design
+
+Collected here in one place rather than scattered across files, since
+each of these is a genuine, considered option - not a gap that was missed:
+
+- **Message drafting via an actual LLM call**, instead of the rule-based
+  `reply_intent` classifier. The current system is deliberately
+  explainable and free - every drafted reply can be traced to one of five
+  named categories in one sentence. An LLM call would handle genuinely
+  novel phrasing the rule-based classifier can't categorize, at the cost
+  of an ongoing API bill, latency, and a harder answer to "why did it say
+  that" in a debrief. Worth doing once messages need to handle truly
+  open-ended replies the five categories don't cover.
+- **Multiple Instagram sending accounts**, each with its own 40/day pool.
+  The `backlog-forecast` numbers make the case for this directly (~341
+  days to clear a 30,000-lead backlog on one account) - this is a
+  business/ops decision about Fleek's actual Instagram presence, not a
+  code change.
+- **Postgres instead of SQLite**, once a single file-based database
+  stops being enough - same SQL throughout this codebase (`ON CONFLICT`
+  aside, which Postgres also supports), so this is a connection-string
+  change, not a rewrite, whenever it's actually needed.
+- **AI voice agents for calls**, instead of the call-script briefing notes
+  this generates today for a human to read from. A deliberate, separate
+  decision for Fleek to make about how much of the call itself should be
+  automated - not something to assume into the design.
 
 ---
 

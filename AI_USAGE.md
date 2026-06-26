@@ -1,140 +1,137 @@
-# How AI Was Used
+# How I Used AI
 
-**Tool:** Claude (chat) - not Claude Code or Cursor. No autonomous agent
-loop; a long, direct conversation with shell/file access, where every
-significant claim was checked rather than taken on trust.
+I built this with Claude, in a normal chat conversation, not Claude Code
+or Cursor. No autonomous agent running off on its own. I sat with it the
+whole way through and checked everything before I accepted it.
 
-This file is the short version. **`DEVELOPMENT_LOG.md` is the complete,
-dated record** of every issue found, how it was found, and how it was
-fixed - read that for the full picture.
+`DEVELOPMENT_LOG.md` has the full, dated record of every bug we found and
+how. This is the short version, in my own words.
 
-## What AI was used for
+## What I used it for
 
-Writing essentially all the code (cleaning, entity resolution, scoring,
-drafting, the CLI, the GitHub Pages dashboard); running real research
-when specifically directed to (Fleek's actual website and customer
-segments, B2B lead-scoring practice, signs of AI-generated writing, sales
-objection-handling technique); building and running the test suite;
-debugging issues live, including ones that only surfaced after deploying
-to GitHub Actions.
+Claude wrote almost all of the code: the cleaning logic, the dedup
+matching, the scoring, the message drafting, the CLI, the dashboard. I
+used it to research things I needed real answers on instead of guesses -
+Fleek's own website and customer segments, how B2B teams handle
+sales objections, what makes text read as AI-written, GitHub's actual API
+rules. It also built and ran the test suite, and helped me debug things
+live once they were deployed and breaking in ways local testing
+hadn't caught.
 
-## Where it genuinely sped things up
+## Where it saved me time
 
-The boring-but-essential parts: surveying every messy field combination
-across 295 real rows by hand would be slow; writing the
-cleaning/scoring/CLI/dashboard code from a clear spec is exactly what AI
-is fast at. Also fast at running real, falsifiable tests once told
-precisely what to check - executing the actual dashboard JavaScript
-against real exported data via Node, or simulating 15 days of plan+send
-cycles at 30,000-lead scale to check for performance degradation over
-time.
+Mostly the parts that are tedious but not hard. Going through 295 messy
+rows by hand to spot every weird date format or duplicate would have
+taken me a long time. Writing the cleaning code, the scoring code, the
+dashboard, all from a clear spec, is exactly what it's fast at. It's also
+genuinely good at running a lot of tests quickly once I tell it exactly
+what to check - running the dashboard's actual code against real data,
+or simulating two weeks of the tool running every day to see if anything
+broke over time.
 
-## The verification discipline that actually shaped this build
+## The thing I did, over and over, that made this work
 
-The single most important thing about this process: **AI's first answer
-was never treated as the final one.** Every claim - "this works," "this
-scales," "this is fixed" - was tested before it was accepted, and almost
-every meaningful fix in this repo exists because that testing was
-insisted on, not because the build caught its own problems. Specifically:
+I never took its first answer as final. If it said "this works" or "this
+is fixed," I made it prove that before I believed it. Almost every real
+fix in this whole project happened because I pushed on something, not
+because Claude caught its own mistake on its own. Here's what that looked like in practice:
 
-**1. Generic output was never accepted as good enough.** The first scoring
-research was standard B2B SaaS material - largely irrelevant to a
-wholesale vintage marketplace. Pushed back on directly, which led to
-properly researching Fleek's own site and finding its actual customer
-segments (New Reseller / Full-Time Reseller / Business) - and, in the
-same pass, catching a real factual error where several drafted messages
-had the entire transaction backwards.
+**I didn't accept generic answers.** The first pass at scoring leads used
+standard B2B SaaS advice that had nothing to do with a vintage clothing
+marketplace. I told it to go look at Fleek's website instead of
+guessing, which is how we found Fleek's real customer segments (New
+Reseller, Full-Time Reseller, Business) - and in the same pass, caught
+that several drafted messages had the whole deal backwards, written as if
+Fleek buys stock from people instead of sells to them.
 
-**2. "It should work" was never accepted without running it.** A bug
-where leads got stuck in a no-cooldown tier forever - silently starving
-the entire daily queue - was only found by demanding an actual multi-day
-simulation be run and the output checked, not by accepting that the logic
-looked correct on paper.
+**I made it run things instead of trusting the logic looked right.**
+There was a bug where leads would get stuck in a stage that never
+cooled down, which meant the same top leads would win the queue forever
+and nobody else would ever get touched. We only found that by running a
+proper multi-day simulation and watching the output, not by reading the
+code and deciding it was fine.
 
-**3. The live, deployed product was checked directly, repeatedly - not
-just the code.** Several real bugs (inconsistent display logic on the
-dashboard, generic "your shop" language sent to resellers who don't have
-a shop) were found by looking at the actual deployed page and asking
-specific, pointed questions about exactly what was on screen and why it
-looked the way it did - not by trusting that passing tests meant the
-product was right.
+**I kept checking the live site myself, not just the code.** A few real
+bugs - the dashboard showing inconsistent info, drafted messages calling
+a reseller's Instagram account "your shop" when they don't have one -
+came from me looking at the deployed page and asking why it
+looked the way it did. Not from anything the tests caught.
 
-**4. The most significant fix in this build came from refusing to accept
-a plausible-looking answer at face value.** Reading two real drafted
-replies next to the actual messages they were supposedly responding to,
-and asking directly whether they made sense, surfaced that the system was
-quoting messages back inside a fixed wrapper regardless of content. That
-single question led to real research (AI-writing-detection signs, B2B
-objection-handling practice) and a properly tested rebuild - which, in
-turn, was checked against all 25 real replies in the dataset and caught a
-genuine classification bug (a negation being read as positive sentiment).
+**The biggest fix in the whole thing came from me just reading two replies
+and asking if they made sense.** I read a real lead's message side by
+side with the reply the tool had drafted back to them, and it was
+obviously wrong - it was just quoting their message back inside the same
+generic sentence every time, no matter what they'd said. That one
+question led to real research on objection handling and on what makes
+writing sound like AI, and a proper rebuild that we then tested against
+every real reply in the dataset - which is how we found a second bug, a
+"not interested" reply getting read as positive because the word
+"interested" is technically inside it.
 
-**5. Even after a fix shipped, "done" was checked again on the live
-site.** When that fix didn't visibly take effect, the cause wasn't
-assumed - it was traced to a real interaction between two correct
-features (the no-double-messaging guarantee locking in text drafted
-before the fix), found by checking the actual live result a second time
-rather than accepting that a passing test suite meant it worked end to
-end.
+**Even after a fix shipped, I checked again on the live site and it
+still wasn't working.** Turned out the message had already been drafted
+hours earlier, before the fix went out, and the tool's own
+no-double-messaging rule had correctly locked that old text in for the
+day. Nothing was broken - it just needed a way to refresh stale
+drafts, which we built.
 
-**6. Confidence claims were repeatedly challenged, not accepted.** Several
-points in this build where the natural answer would have been "yes, this
-is finished" were instead met with "are you sure - have you actually
-checked," which is the direct reason for the 30,000-lead scale tests, the
-multi-day rotation simulation, the GitHub Actions live verification, and
-the backlog-forecast numbers that ended up driving the scaling reasoning
-in `GTM_STRATEGY.md`.
+**I kept pushing back when I was told things were finished.** More than
+once. Each time, that led to more testing - the 30,000-lead load test, the
+multi-day rotation check, an actual live run on GitHub Actions, the
+backlog numbers that ended up driving the whole scaling argument in
+`GTM_STRATEGY.md`.
 
-**7. Even after being told the project was essentially finished - twice -
-that was rejected, and it found two more real, would-have-shipped bugs.**
-Asked directly "why would we not turn this into GitHub Issues instead of
-a CSV" led to building a GitHub Issues integration. The first version of
-it assumed GitHub auto-creates a label when a new issue references it -
-untrue, confirmed against GitHub's own documentation and real bug reports
-once actually told to research GitHub's specific platform behavior rather
-than write code from general knowledge. That version would have failed
-outright the first time it ran against a real repository. The same
-research pass also surfaced that the design didn't actually scale the way
-it was claimed to (one API search call per flagged lead, against a
-platform rate limit that's a real, documented number, not a guess) -
-leading to a proper redesign and a database migration that was then
-separately verified against a simulated already-existing database to
-make sure it wouldn't silently corrupt real data.
+**I told it twice not to accept "this is done," and both times it found
+something real.** When I asked why we weren't using GitHub Issues instead
+of a CSV for flagged leads, it built that - but the first version assumed
+GitHub creates a label automatically when you reference it in a new
+issue. That's not true. I told it to check GitHub's own docs
+instead of guessing, and it found real bug reports confirming the label
+has to exist first or the whole thing fails. The same check also found
+that the design would've hit GitHub's API rate limit at real scale,
+because it was searching the API once per flagged lead every single run.
+Both got fixed, and the database change that came out of it got tested
+against a copy of an already-running database to make sure it wouldn't
+wipe anything.
 
-## The honest pattern
+**I asked a specific question about where new leads would actually come
+from day to day, not a vague "is this automated" question.** That led to
+checking Google's Places API and Instagram's API side by side instead of
+assuming they work the same way. Turns out they don't - Google's API
+genuinely supports searching for businesses by category and area, no
+scraping needed. Instagram's official API has no general search at all,
+confirmed straight from their own docs, and there are real reports of
+apps getting banned for trying to get around that with scraping. That's
+exactly why the brief calls online resellers "the hard one" - now I have
+an actual source for why that's true, not just the brief's own word for
+it.
 
-AI is fast at producing a plausible first draft and at running
-exhaustive, falsifiable tests once told exactly what to check. It does
-not reliably catch its own generic defaults, blind spots, or
-content-level mistakes by reviewing its own work - and it especially does
-not reliably know which of its own assumptions about a specific platform
-(GitHub's API behavior, Instagram's rate limits, a specific Python
-version) are actually true versus just plausible-sounding, unless directed
-to go and check. In this build, nearly every meaningful fix traces back to
-a specific, sometimes blunt question about whether something was actually
-true - asked, checked, and not let go of until it was either proven or
-fixed. That discipline is the actual reason this system is in the state
-it's in, and it's worth being straightforward about rather than
-presenting the result as something more automatic than it was.
+## The honest takeaway
 
-## The lesson worth carrying forward
+Claude is fast at writing a plausible first draft and fast at running
+exhaustive tests once I tell it exactly what to check. It doesn't catch
+its own blind spots on its own, especially about specific platforms -
+what GitHub's API actually allows, what Instagram's API actually allows,
+which Python version something needs. It doesn't know which of its own
+assumptions are wrong unless I tell it to go check. Nearly every real fix
+in this project came from me asking a specific, sometimes blunt question
+and not letting it go until it was actually proven, not from Claude fixing itself.
 
-The clearest pattern across this entire build: almost every real bug
-traced back to an assumption about something specific - Fleek's actual
-business model, GitHub's actual platform behavior, a particular Python
-version, a specific API's rate limits - that turned out to be wrong, and
-was only caught because of a direct instruction to go research it
-properly rather than reason from general knowledge. The fix that came out
-of that pattern, late, every time, was always "research this specific
-thing properly first." The better version of this process would have
-front-loaded that instruction at the very start - asking for
-company-specific, industry-specific, and platform-specific research
-*before* writing the first line of code, rather than discovering each gap
-reactively, one expensive bug at a time, over the course of the build.
-That's a genuine process improvement worth carrying into the next project,
-not just a note about this one.
+## What I'd do differently next time
 
-See `DEVELOPMENT_LOG.md` for the complete trail, and `GTM_STRATEGY.md`
-for the commercial reasoning behind how the system prioritizes, sequences,
+Looking back at this whole project, almost every real bug came from the
+same root cause: an assumption about something specific - Fleek's actual
+business, GitHub's actual API behavior, a particular Python version, a
+specific platform's rate limits - that turned out to be wrong, and we only
+caught it because I told it to stop and research that one thing
+properly. That happened late, every time, after the fact.
+
+The better way to do this would be to ask for that kind of specific,
+company- and platform-level research right at the very start, before
+writing a single line of code, instead of finding each gap one expensive
+bug at a time as the build went on. That's the real lesson I'm taking
+into the next project, not just something I'm noting about this one.
+
+See `DEVELOPMENT_LOG.md` for the full trail, and `GTM_STRATEGY.md` for
+the actual commercial reasoning behind how this prioritizes, sequences,
 and scales outreach.
-

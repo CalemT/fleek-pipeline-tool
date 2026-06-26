@@ -234,17 +234,19 @@ locally requires `export GITHUB_TOKEN=<a personal access token with the
 message rather than crashing or silently doing nothing - verified this
 exact path locally.
 
-**Honest limitation that remains:** the request-building, deduplication,
-label-creation, and cap logic are all tested with a mocked GitHub API
-(`tests/test_github_issues.py`, 10 tests including two full integration
-tests). What still *isn't* verified from this side is an actual issue
-landing in a real, live repo's Issues tab - that needs one real run
-against real GitHub infrastructure to fully confirm, the same way the
-workflow's cache and Pages behavior needed a live run before either was
-trusted. Also a deliberate scope boundary, not an oversight: issues
-aren't auto-closed when the underlying flag clears - a person closes it
-once they've actually verified the fix, which is safer than auto-closing
-something that might have an ongoing discussion on it.
+**Verified live, not just with mocks:** the request-building,
+deduplication, label-creation, and cap logic are all tested with a mocked
+GitHub API (`tests/test_github_issues.py`, 10 tests including two full
+integration tests) - and then confirmed against the real, live repo: the
+`data-quality` label was created automatically (it didn't exist before),
+16 real Issues were opened by the workflow with correct titles, labels,
+and bodies (flags, contact details, estimated spend, source record IDs),
+and clicking into one showed the content rendering exactly as designed,
+including GitHub auto-linking the email as a clickable `mailto:`. Still a
+deliberate scope boundary, not an oversight: issues aren't auto-closed
+when the underlying flag clears - a person closes it once they've
+actually verified the fix, which is safer than auto-closing something
+that might have an ongoing discussion on it.
 
 ## Will this actually keep up at scale?
 

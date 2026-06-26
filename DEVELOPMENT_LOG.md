@@ -170,6 +170,24 @@ accepting it as finished.
 | 11.4 | **A second real bug found in the same research pass**: the design didn't scale the way it was claimed to | `GITHUB_TOKEN` is capped at 1,000 requests/hour per repo (a real, documented number) - the original design made one search call per flagged lead, every single run, which would not have held up as the flagged-lead count grew toward real scale |
 | 11.5 | Fix | Added `ensure_label_exists()` (idempotent - treats "already exists" as success, not an error) and redesigned tracking to store each lead's issue number locally, so steady-state cost no longer scales with the total number of flagged leads |
 | 11.6 | Verification that mattered most | The redesign required a new database column on a table that **already existed and was already populated** with hours of real data - tested this specific scenario directly by simulating an old-schema database and confirming the migration adds the column with zero data loss, rather than assuming a schema change is safe |
+| 11.7 | Live confirmation, after deployment | Triggered the real workflow against the real repo: the `data-quality` label was created automatically (didn't exist before), 16 real Issues were opened with correct titles/labels/bodies (flags, contact details, est. spend, source record IDs), and the content rendered exactly as designed when opened - closing the one gap that genuinely couldn't be tested without live GitHub access |
+
+---
+
+## Phase 12 - "What's the point of running every morning if data still goes in by hand?"
+
+**Trigger:** a direct, specific question about how new leads would
+actually arrive day to day - not "is this automated" answered in the
+abstract, but specifically what would feed the automation in the real
+world.
+
+| # | Step | Detail |
+|---|---|---|
+| 12.1 | Question asked | If the daily run is automatic but a person still has to manually assemble and drop in a new lead file, what's actually been gained? |
+| 12.2 | Research, not assumption | Checked Google's Places API documentation and Instagram's Graph API documentation directly, rather than assuming the two platforms behave similarly |
+| 12.3 | Finding (stores) | Google's Places API genuinely supports searching for businesses by category and location ("vintage clothing shops in Manchester") - official, documented, not scraping. The handover data's own `source` column already has rows labeled `google_maps`, suggesting Fleek likely already does some version of this by hand |
+| 12.4 | Finding (resellers) | Instagram's official API has no general search or discovery endpoint at all - confirmed against Instagram's own documentation, plus multiple real reports of apps being blocked for trying to route around that restriction via scraping. This is a platform-level fact, not a guess, and it directly explains why the brief itself frames online resellers as "the hard one" |
+| 12.5 | Outcome | Designed (not built) two different sourcing patterns matched to what each platform actually allows: a fully automatic feed for stores, a human-reviewed staging step for resellers - and documented the explicit reason this wasn't built the night before presenting: it would require a brand-new, never-tested-live credential with no time left to catch a live bug if one existed, the exact risk pattern Phase 11 had just demonstrated the cost of |
 
 ---
 
