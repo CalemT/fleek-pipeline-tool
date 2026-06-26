@@ -315,6 +315,19 @@ each of these is a genuine, considered option - not a gap that was missed:
   this generates today for a human to read from. A deliberate, separate
   decision for Fleek to make about how much of the call itself should be
   automated - not something to assume into the design.
+- **A custom GitHub Pages deployment step**, instead of relying on
+  GitHub's default "deploy from branch" behavior. That default rebuilds
+  the whole Pages site on every qualifying push to `main`, not just ones
+  that touch `docs/` - so uploading a new lead file triggers a rebuild
+  immediately, before the actual data has updated, and then a second,
+  meaningful rebuild happens once the daily plan actually runs. Not a
+  correctness issue (the dashboard always ends up showing the right data
+  once everything settles, and GitHub already excludes the workflow's own
+  internal commits from re-triggering this, specifically to prevent
+  rebuild loops), just an efficiency one. The proper fix is a custom
+  deployment step using `actions/deploy-pages`, run only as the literal
+  last step of the daily pipeline itself - a config change worth making
+  once it's not the night before presenting.
 
 ---
 
