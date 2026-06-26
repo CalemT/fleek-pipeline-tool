@@ -1,7 +1,7 @@
 # How I Used AI
 
-I built this with Claude, in a normal chat conversation, not Claude Cowork
-or Cursor, a chat and a terminal tab for coding. No autonomous agent running off on its own. I sat with it the
+I built this with Claude, in a normal chat conversation, not Claude Code
+or Cursor. No autonomous agent running off on its own. I sat with it the
 whole way through and checked everything before I accepted it.
 
 `DEVELOPMENT_LOG.md` has the full, dated record of every bug we found and
@@ -16,13 +16,11 @@ Fleek's own website and customer segments, how B2B teams handle
 sales objections, what makes text read as AI-written, GitHub's actual API
 rules. It also built and ran the test suite, and helped me debug things
 live once they were deployed and breaking in ways local testing
-hadn't caught. My thoughts on AI are that you don't have to be a genius,
-you are allowed the opportunity to pull the puppet strings behind the 
-genius, understanding how to pull them correctly defines the outcome.
+hadn't caught.
 
 ## Where it saved me time
 
-All the months of coding and building and researching and the parts that are tedious. Going through 295 messy
+Mostly the parts that are tedious but not hard. Going through 295 messy
 rows by hand to spot every weird date format or duplicate would have
 taken me a long time. Writing the cleaning code, the scoring code, the
 dashboard, all from a clear spec, is exactly what it's fast at. It's also
@@ -131,11 +129,7 @@ properly. That happened late, every time, after the fact.
 The better way to do this would be to ask for that kind of specific,
 company- and platform-level research right at the very start, before
 writing a single line of code, instead of finding each gap one expensive
-bug at a time as the build went on. Also, rather than working off of the brief, 
-having a set build list on building out the back end, otpimising the front-end 
-for ease of use, and installing built in formulas to ensure continuous improvement
-as the tool runs over time, I did all of these things, but now that I understand
-the build more, I would optimise the approach.  That's the real lesson I'm taking
+bug at a time as the build went on. That's the real lesson I'm taking
 into the next project, not just something I'm noting about this one.
 
 See `DEVELOPMENT_LOG.md` for the full trail, and `GTM_STRATEGY.md` for

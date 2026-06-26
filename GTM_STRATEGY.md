@@ -7,6 +7,65 @@ to reproduce them.
 
 ---
 
+## Quick reference: every adjustable number and self-correcting mechanism
+
+Pulled into one place from across this repo, since these details are
+otherwise scattered across `README.md`, `ARCHITECTURE.md`, and this file.
+
+**Every daily limit, and why that exact number:**
+
+| Limit | Value | Real or placeholder | Where it lives |
+|---|---|---|---|
+| Instagram DMs/day | 40 | Real - the platform's actual spam threshold | `config/assumptions.yaml` |
+| Emails/day | 150 | Placeholder - real ceiling is sender deliverability, not headcount | `config/assumptions.yaml` |
+| Calls/day | 30 | Placeholder - typical single-BDR dialing benchmark | `config/assumptions.yaml` |
+| Visits/day | 5 | Placeholder - travel time is the real constraint | `config/assumptions.yaml` |
+| Stores needed in a city before a visit trip is "worth it" | 3 | Placeholder | `config/assumptions.yaml` |
+| GitHub Issues created per run for flagged leads | 20 | Placeholder, to avoid flooding the Issues tab at scale | `config/assumptions.yaml` |
+
+All six live in one file, deliberately - Fleek can change any of them
+without touching a line of code.
+
+**The mechanisms that adjust themselves, and exactly what each checks:**
+
+| Command | What it does | What it's waiting on |
+|---|---|---|
+| `recalibrate` | Fits real scoring weights from won/lost outcomes via logistic regression | ~70 real outcomes (10 per feature, the standard statistics rule of thumb) - today there are 9 |
+| `calibration` | Compares score-at-time-of-action against real wins/losses, no fitting | Enough leads to have resolved *through the tool's own loop*, not before it existed |
+| `rebalance-caps` | Recommends shifting capacity toward whichever channel converts best | Real conversion-rate data per channel - currently blank placeholders |
+| `redraft` | Refreshes message wording for anything queued but not yet sent, if a template changes | Nothing - runs every day automatically, never touches anything already sent |
+| `backlog-forecast` | Calculates days-to-clear the current backlog at today's caps | Nothing - this is just real arithmetic on the current data |
+
+**Smaller design details worth having ready, not headline features:**
+
+- **Phone numbers are matched using a real phone-parsing library**
+  (`phonenumbers`, the same engine behind Google's libphonenumber), not a
+  digits-stripping guess - so the same UK number written three different
+  ways is recognized as one person, but a UK and a US number that happen
+  to share some digits are never wrongly merged.
+- **The store contact ladder (email → call → visit) escalates based on
+  how many times someone's actually been touched**, not a fixed calendar
+  schedule - a store only gets escalated to an in-person visit once
+  contact has genuinely been tried and failed enough times.
+- **Channel and lead type are tracked as two separate questions.** How we
+  *reach* someone (email/phone vs Instagram-only) and what they actually
+  *are* (a reseller vs a real shop) aren't the same thing - a reseller who
+  happens to have an email on file still gets reseller-specific messaging,
+  not generic shop language.
+- **Drafted replies are classified by intent** (objection, pricing
+  question, logistics question, positive, stall) using a small rule-based
+  system grounded in real B2B objection-handling research, with multiple
+  phrasings per category chosen deterministically per lead - so two
+  different people who both raise an objection don't receive identical
+  text, since identical phrasing across messages is itself a documented
+  sign of AI-generated writing.
+- **The scheduled GitHub Action commits a small status update every
+  successful run**, which resets GitHub's own documented 60-day
+  auto-disable for inactive scheduled workflows - otherwise the daily run
+  would silently stop firing after two months with no warning.
+
+---
+
 ## Who gets today's 40 Instagram DMs, and why
 
 ### The mechanism, in full
