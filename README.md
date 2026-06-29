@@ -136,12 +136,28 @@ the actual drafted message, and the last thing they said to us. Visit plan
 gets its own tab showing which cities are flagged trip-worthy.
 
 **The dashboard is also the operational front end, not just a viewer.**
-Two buttons sit right in the header:
+Two buttons sit right in the header, plus one on every individual lead:
 - **"Add new leads"** - opens GitHub's own file-upload page, scoped to
   `data/incoming/`. Drag a file in, commit it, no terminal involved.
 - **"Run today's plan"** - opens the Actions tab for the daily workflow,
   where the existing "Run workflow" button triggers a fresh run on
   demand, also with no terminal involved.
+- **"Mark as sent"** (on each lead, once expanded) - opens a dedicated
+  workflow with one input: paste the action ID shown right next to the
+  button, click Run. GitHub doesn't support pre-filling a workflow's
+  input via a link - checked directly against GitHub's own community
+  discussions, this genuinely isn't supported - so it's one paste, not
+  zero clicks, but it's still entirely done in a browser. This is what
+  actually advances a lead's cooldown, so the next highest-priority lead
+  surfaces tomorrow instead of the same one winning forever.
+- **Bulk marking** - a checkbox on every queued lead lets you select
+  several at once. A selection bar appears with a "Copy IDs" button
+  (copies a comma-separated list like `5,9,12`) and the same "Mark as
+  sent" link - paste the whole list into the one input field and it marks
+  every one of them in a single run. Built specifically for working
+  through a whole session's worth of outreach and recording it all at
+  once, rather than one lead at a time. `action_id` is also in the CSV
+  exports, for anyone working from a spreadsheet instead of the dashboard.
 
 A **"Recent imports"** panel under the header shows the last 10 batches
 ingested - batch name, when, exactly how many leads were new versus

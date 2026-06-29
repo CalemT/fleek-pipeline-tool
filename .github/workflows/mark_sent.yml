@@ -1,0 +1,55 @@
+name: Mark action(s) sent
+
+# The dashboard's "Mark as sent" / "Mark selected as sent" controls link
+# here. GitHub doesn't support pre-filling a workflow's input via a link
+# (confirmed - this isn't supported by GitHub's UI at all, not something
+# we're missing a trick for), so this is a one-field form: paste in one ID
+# or a whole batch of them at once, click Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      action_ids:
+        description: "One action ID, or several separated by commas (e.g. 4,9,12) - copy from the dashboard"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  mark-sent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Same cache key scheme as the daily workflow, so this reads and
+      # writes the exact same live database - not a separate one.
+      - name: Restore pipeline database
+        uses: actions/cache@v4
+        with:
+          path: output/fleek.db
+          key: fleek-db-${{ github.run_id }}
+          restore-keys: fleek-db-
+
+      - name: Mark each sent and refresh the dashboard
+        run: |
+          IFS=',' read -ra IDS <<< "$(echo "${{ inputs.action_ids }}" | tr -d ' ')"
+          for id in "${IDS[@]}"; do
+            [ -n "$id" ] && python3 -m src.cli send --action-id "$id"
+          done
+          python3 -m src.cli export-dashboard
+
+      - name: Commit the updated dashboard data
+        run: |
+          git config user.name "fleek-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/latest.json
+          git diff --staged --quiet || git commit -m "Mark action(s) sent: ${{ inputs.action_ids }}"
+          git push

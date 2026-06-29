@@ -298,6 +298,62 @@
     margin: 8px 0;
   }
 
+  .sent-control {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; flex-wrap: wrap;
+  }
+  .copy-id-btn {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .copy-id-btn:hover { background: var(--surface); }
+  .copy-id-btn code { font-weight: 600; }
+  .action-link.small {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .sent-confirmed {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--olive);
+    margin-top: 10px;
+  }
+
+  .lead-row-wrap {
+    display: flex; align-items: center;
+    background: var(--surface-raised);
+  }
+  .lead-row-wrap:hover { background: var(--surface); }
+  .lead-row-wrap .lead-row { background: transparent; flex: 1; }
+  .lead-row-wrap:hover .lead-row { background: transparent; }
+  .lead-select, .lead-select-spacer {
+    flex: none; width: 32px; display: flex; justify-content: center;
+  }
+  .lead-select { cursor: pointer; width: 16px; height: 16px; margin-left: 14px; }
+
+  .selection-bar {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface-raised);
+    border: 1px solid var(--denim);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .selection-count {
+    font-family: var(--stencil); font-weight: 600; font-size: 13px;
+    color: var(--denim);
+  }
+  .clear-selection-btn {
+    font-family: var(--mono); font-size: 12px;
+    background: none; border: none; color: var(--ink-soft);
+    text-decoration: underline; cursor: pointer; margin-left: auto;
+  }
+
   .queued-flag {
     font-family: var(--mono); font-size: 10.5px;
     padding: 2px 6px; border-radius: var(--radius);
@@ -356,6 +412,8 @@
     <button role="tab" aria-selected="false" data-panel="visits">Visit Plan</button>
   </nav>
 
+  <div id="selectionBar" class="selection-bar" style="display:none"></div>
+
   <section class="panel active" id="panel-instagram"></section>
   <section class="panel" id="panel-stores"></section>
   <section class="panel" id="panel-visits"></section>
@@ -401,17 +459,27 @@ function leadRow(lead, idx, prefix) {
     ? `<span class="type-badge ${lead.lead_type}">${lead.lead_type === 'store' ? 'Business' : 'Reseller'}</span>`
     : '';
 
+  // Only a queued-but-unsent action is selectable for bulk marking -
+  // nothing to select for a lead with no action today, or one already sent.
+  const checkbox = (lead.action_id && lead.action_status === 'queued')
+    ? `<input type="checkbox" class="lead-select" aria-label="Select for bulk mark-as-sent"
+         onclick="event.stopPropagation()" onchange="toggleSelect(${lead.action_id}, this.checked)">`
+    : `<span class="lead-select-spacer"></span>`;
+
   return `
     <li class="lead">
-      <button class="lead-row" aria-expanded="false" aria-controls="${id}" onclick="toggleLead('${id}')">
-        <span class="dot ${lead.tier}" title="${TIER_LABEL[lead.tier] || lead.tier}"></span>
-        <span class="lead-name">${escapeHtml(name)}${sub ? `<span class="sub">${sub}</span>` : ''}</span>
-        ${typeBadge}
-        ${queuedBadge}
-        <span class="lead-meta">${TIER_LABEL[lead.tier] || lead.tier} &middot; ${escapeHtml(lead.action_type || '')}</span>
-        <span class="lead-score">${lead.score}</span>
-        <span class="chev">&#10095;</span>
-      </button>
+      <div class="lead-row-wrap">
+        ${checkbox}
+        <button class="lead-row" aria-expanded="false" aria-controls="${id}" onclick="toggleLead('${id}')">
+          <span class="dot ${lead.tier}" title="${TIER_LABEL[lead.tier] || lead.tier}"></span>
+          <span class="lead-name">${escapeHtml(name)}${sub ? `<span class="sub">${sub}</span>` : ''}</span>
+          ${typeBadge}
+          ${queuedBadge}
+          <span class="lead-meta">${TIER_LABEL[lead.tier] || lead.tier} &middot; ${escapeHtml(lead.action_type || '')}</span>
+          <span class="lead-score">${lead.score}</span>
+          <span class="chev">&#10095;</span>
+        </button>
+      </div>
       <div class="lead-detail" id="${id}">
         <dl class="detail-grid">
           <div><dt>Stage</dt><dd>${escapeHtml(lead.stage)}</dd></div>
@@ -433,9 +501,78 @@ function leadRow(lead, idx, prefix) {
         ${lead.message_draft ? `
           <div class="draft-label">Drafted ${escapeHtml(lead.action_type)}</div>
           <div class="draft-box">${escapeHtml(lead.message_draft)}</div>
+          ${sentControl(lead)}
         ` : '<p class="inbound">No action drafted today.</p>'}
       </div>
     </li>`;
+}
+
+const selectedIds = new Set();
+
+function toggleSelect(actionId, checked) {
+  if (checked) selectedIds.add(actionId);
+  else selectedIds.delete(actionId);
+  renderSelectionBar();
+}
+
+function renderSelectionBar() {
+  const bar = document.getElementById('selectionBar');
+  if (selectedIds.size === 0) {
+    bar.style.display = 'none';
+    bar.innerHTML = '';
+    return;
+  }
+  const ids = [...selectedIds].sort((a, b) => a - b).join(',');
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    <span class="selection-count">${selectedIds.size} selected</span>
+    <button class="copy-id-btn" onclick="copySelectedIds(this)">Copy IDs: <code>${ids}</code></button>
+    <a class="action-link small" href="https://github.com/CalemT/fleek-pipeline-tool/actions/workflows/mark_sent.yml" target="_blank" rel="noopener">Mark selected as sent &#8599;</a>
+    <button class="clear-selection-btn" onclick="clearSelection()">Clear</button>
+  `;
+}
+
+function copySelectedIds(btn) {
+  const ids = [...selectedIds].sort((a, b) => a - b).join(',');
+  navigator.clipboard.writeText(ids).then(() => {
+    const original = btn.innerHTML;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.innerHTML = original; }, 1500);
+  });
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.lead-select').forEach(cb => { cb.checked = false; });
+  renderSelectionBar();
+}
+
+function sentControl(lead) {
+  if (!lead.action_id) return '';
+  if (lead.action_status === 'sent') {
+    return `<p class="sent-confirmed">&#10003; Marked sent (action #${lead.action_id})</p>`;
+  }
+  // GitHub doesn't support pre-filling a workflow's input via a link, so
+  // this can't be a single click - it opens the right page and shows the
+  // number to paste in, which is still fully done in the browser, no
+  // terminal involved.
+  return `
+    <div class="sent-control">
+      <button class="copy-id-btn" onclick="copyActionId(${lead.action_id}, this)">
+        Copy action ID: <code>${lead.action_id}</code>
+      </button>
+      <a class="action-link small" href="https://github.com/CalemT/fleek-pipeline-tool/actions/workflows/mark_sent.yml" target="_blank" rel="noopener">
+        Mark as sent &#8599;
+      </a>
+    </div>`;
+}
+
+function copyActionId(id, btn) {
+  navigator.clipboard.writeText(String(id)).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.innerHTML = `Copy action ID: <code>${id}</code>`; }, 1500);
+  });
 }
 
 function toggleLead(id) {

@@ -155,7 +155,7 @@ def _write_csv(path, queue, conn, today_iso, group_by_city=False):
     rows = []
     for lead, tier, score, status in queue:
         action_row = conn.execute(
-            "SELECT action_type, message_draft FROM actions_log "
+            "SELECT id, action_type, message_draft FROM actions_log "
             "WHERE lead_key=? AND action_date=? ORDER BY id DESC LIMIT 1",
             (lead["lead_key"], today_iso),
         ).fetchone()
@@ -171,6 +171,7 @@ def _write_csv(path, queue, conn, today_iso, group_by_city=False):
             "segment": lead["segment"],
             "tier": tier,
             "score": round(score, 1),
+            "action_id": action_row["id"] if action_row else "",
             "action_type": action_row["action_type"] if action_row else "",
             "message_draft": action_row["message_draft"] if action_row else "",
             "est_monthly_spend_gbp": lead["est_monthly_spend_gbp"],
@@ -610,7 +611,7 @@ def cmd_export_dashboard(args):
             if tier is None:
                 continue
             action_row = conn.execute(
-                "SELECT action_type, message_draft, status FROM actions_log "
+                "SELECT id, action_type, message_draft, status FROM actions_log "
                 "WHERE lead_key=? AND action_date=? ORDER BY id DESC LIMIT 1",
                 (lead["lead_key"], today_iso),
             ).fetchone()
@@ -634,8 +635,10 @@ def cmd_export_dashboard(args):
                 "num_touches": lead["num_touches"],
                 "last_inbound_text": lead["last_inbound_text"],
                 "notes": lead["notes"],
+                "action_id": action_row["id"] if action_row else None,
                 "action_type": action_row["action_type"] if action_row else None,
                 "message_draft": action_row["message_draft"] if action_row else None,
+                "action_status": action_row["status"] if action_row else None,
                 "queued_today": bool(action_row),
                 "source_lead_ids": lead["source_lead_ids"],
             })
@@ -664,7 +667,7 @@ def cmd_export_dashboard(args):
         if drafting.next_action_type(lead, tier) != "visit":
             continue
         action_row = conn.execute(
-            "SELECT action_type, message_draft, status FROM actions_log "
+            "SELECT id, action_type, message_draft, status FROM actions_log "
             "WHERE lead_key=? AND action_date=? ORDER BY id DESC LIMIT 1",
             (lead["lead_key"], today_iso),
         ).fetchone()
@@ -674,8 +677,10 @@ def cmd_export_dashboard(args):
             "phone": lead["phone"], "city": lead["city"], "stage": lead["stage"],
             "segment": lead["segment"], "lead_type": lead["lead_type"], "tier": tier, "score": round(score, 1),
             "num_touches": lead["num_touches"], "last_inbound_text": lead["last_inbound_text"],
+            "action_id": action_row["id"] if action_row else None,
             "action_type": "visit",
             "message_draft": action_row["message_draft"] if action_row else None,
+            "action_status": action_row["status"] if action_row else None,
             "queued_today": bool(action_row),
         })
 
