@@ -331,9 +331,10 @@
   .lead-row-wrap .lead-row { background: transparent; flex: 1; }
   .lead-row-wrap:hover .lead-row { background: transparent; }
   .lead-select, .lead-select-spacer {
-    flex: none; width: 32px; display: flex; justify-content: center;
+    flex: none; width: 32px; display: flex; align-items: center; justify-content: center;
   }
   .lead-select { cursor: pointer; width: 16px; height: 16px; margin-left: 14px; }
+  .lead-select-spacer { color: var(--olive); font-size: 14px; font-weight: 600; }
 
   .selection-bar {
     display: flex; align-items: center; gap: 12px;
@@ -439,7 +440,7 @@ function fmtMoney(v) {
   return '£' + Number(v).toLocaleString();
 }
 
-function leadRow(lead, idx, prefix) {
+function leadRow(lead, idx, prefix, selectable = true) {
   const id = `${prefix}-${idx}`;
   const name = lead.store_name || lead.handle || lead.contact_name || '(unnamed)';
   // City and handle are two separate facts and should never silently
@@ -459,12 +460,21 @@ function leadRow(lead, idx, prefix) {
     ? `<span class="type-badge ${lead.lead_type}">${lead.lead_type === 'store' ? 'Business' : 'Reseller'}</span>`
     : '';
 
-  // Only a queued-but-unsent action is selectable for bulk marking -
-  // nothing to select for a lead with no action today, or one already sent.
-  const checkbox = (lead.action_id && lead.action_status === 'queued')
-    ? `<input type="checkbox" class="lead-select" aria-label="Select for bulk mark-as-sent"
-         onclick="event.stopPropagation()" onchange="toggleSelect(${lead.action_id}, this.checked)">`
-    : `<span class="lead-select-spacer"></span>`;
+  // Only a queued-but-unsent action is selectable for bulk marking - and
+  // only on tabs where "mark as sent" is even the right action (Instagram
+  // DMs and Store Outreach). A visit isn't "sent," it's done in person -
+  // the visit-plan tab never gets a send checkbox at all.
+  let checkbox;
+  if (!selectable) {
+    checkbox = '';
+  } else if (lead.action_id && lead.action_status === 'queued') {
+    checkbox = `<input type="checkbox" class="lead-select" aria-label="Select for bulk mark-as-sent"
+         onclick="event.stopPropagation()" onchange="toggleSelect(${lead.action_id}, this.checked)">`;
+  } else if (lead.action_status === 'sent') {
+    checkbox = `<span class="lead-select-spacer" title="Already marked sent">&#10003;</span>`;
+  } else {
+    checkbox = `<span class="lead-select-spacer"></span>`;
+  }
 
   return `
     <li class="lead">
@@ -582,9 +592,9 @@ function toggleLead(id) {
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
-function renderList(leads, prefix) {
+function renderList(leads, prefix, selectable = true) {
   if (!leads.length) return '<p class="empty">Nothing in this queue right now.</p>';
-  return `<ul class="leads">${leads.map((l, i) => leadRow(l, i, prefix)).join('')}</ul>`;
+  return `<ul class="leads">${leads.map((l, i) => leadRow(l, i, prefix, selectable)).join('')}</ul>`;
 }
 
 function renderVisitPlan(visitPlan) {
@@ -595,7 +605,7 @@ function renderVisitPlan(visitPlan) {
         <span>${escapeHtml(group.city)} &middot; ${group.leads.length} store${group.leads.length === 1 ? '' : 's'}</span>
         <span class="city-badge ${group.trip_worthy ? 'worthy' : 'notyet'}">${group.trip_worthy ? 'BOOK THIS WEEK' : 'NOT YET'}</span>
       </div>
-      ${renderList(group.leads, `v${gi}`)}
+      ${renderList(group.leads, `v${gi}`, false)}
     </div>
   `).join('');
 }
