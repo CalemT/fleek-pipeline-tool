@@ -191,6 +191,24 @@ world.
 
 ---
 
+## Phase 13 - An incomplete fix, found live, fixed properly the second time
+
+**Trigger:** after building bulk mark-as-sent (checkboxes, a selection
+bar, a relabeled "Mark as scheduled for visit" idea), the user found a
+real bug live on the deployed page: the Visit Plan tab had no checkbox
+(correct), but still showed a literal "Mark as sent" button inside each
+lead's expanded detail - the wrong label for an action that's completed
+in person, not sent as a message.
+
+| # | Step | Detail |
+|---|---|---|
+| 13.1 | Root cause | The checkbox and the expanded-detail button are two separate pieces of UI, rendered by two different functions (`leadRow` for the row checkbox, `sentControl` for the detail panel). The first fix only updated the checkbox's visibility condition - `sentControl` was never touched, so it kept rendering unconditionally on every tab, including Visit Plan |
+| 13.2 | User's direct, fair pushback | Pointed out that this back-and-forth was costing real time and credits, and asked for more discipline: trace an issue fully before calling it fixed, and check before committing rather than after |
+| 13.3 | Fix, done properly this time | Brainstormed the actual design first, before writing any code: should a visit be "sent" at all, should it carry a real scheduled date, or just a relabeled status using the exact same mechanism. Settled on the simplest defensible option - same `send`/`mark_sent.yml` mechanism underneath, label driven by `lead.action_type === 'visit'` ("scheduled for visit" vs "sent") - explicitly chosen over building a second, untested two-field date-collection flow one week before a real deadline |
+| 13.4 | Verification | Tested both states explicitly this time, not just the one that had just broken: confirmed Visit Plan rows have no checkbox AND show the relabeled button, while Instagram/Store rows are unchanged - both checked together, not just the one being fixed |
+
+---
+
 ## What this log is for
 
 Anyone reading this top to bottom should be able to see exactly which

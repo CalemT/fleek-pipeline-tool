@@ -559,20 +559,26 @@ function clearSelection() {
 
 function sentControl(lead) {
   if (!lead.action_id) return '';
+  const isVisit = lead.action_type === 'visit';
+  const verb = isVisit ? 'scheduled for visit' : 'sent';
   if (lead.action_status === 'sent') {
-    return `<p class="sent-confirmed">&#10003; Marked sent (action #${lead.action_id})</p>`;
+    return `<p class="sent-confirmed">&#10003; Marked ${verb} (action #${lead.action_id})</p>`;
   }
   // GitHub doesn't support pre-filling a workflow's input via a link, so
   // this can't be a single click - it opens the right page and shows the
   // number to paste in, which is still fully done in the browser, no
-  // terminal involved.
+  // terminal involved. Visits reuse the exact same send/mark_sent
+  // mechanism underneath - "scheduled for visit" is just the label,
+  // not a different code path, since adding a real second mechanism
+  // (e.g. collecting an actual planned date) is a bigger change than
+  // this needs right now.
   return `
     <div class="sent-control">
       <button class="copy-id-btn" onclick="copyActionId(${lead.action_id}, this)">
         Copy action ID: <code>${lead.action_id}</code>
       </button>
       <a class="action-link small" href="https://github.com/CalemT/fleek-pipeline-tool/actions/workflows/mark_sent.yml" target="_blank" rel="noopener">
-        Mark as sent &#8599;
+        Mark as ${verb} &#8599;
       </a>
     </div>`;
 }

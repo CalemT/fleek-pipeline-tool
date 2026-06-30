@@ -149,15 +149,23 @@ Two buttons sit right in the header, plus one on every individual lead:
   discussions, this genuinely isn't supported - so it's one paste, not
   zero clicks, but it's still entirely done in a browser. This is what
   actually advances a lead's cooldown, so the next highest-priority lead
-  surfaces tomorrow instead of the same one winning forever.
-- **Bulk marking** - a checkbox on every queued lead lets you select
-  several at once. A selection bar appears with a "Copy IDs" button
-  (copies a comma-separated list like `5,9,12`) and the same "Mark as
-  sent" link - paste the whole list into the one input field and it marks
-  every one of them in a single run. Built specifically for working
-  through a whole session's worth of outreach and recording it all at
-  once, rather than one lead at a time. `action_id` is also in the CSV
-  exports, for anyone working from a spreadsheet instead of the dashboard.
+  surfaces tomorrow instead of the same one winning forever. On the Visit
+  Plan tab specifically, the same button reads "Mark as scheduled for
+  visit" instead - same underlying mechanism (a visit is still just
+  another action type being closed out), different label, since
+  scheduling a visit and sending a message aren't the same real-world
+  action even though the code treats them the same way underneath.
+- **Bulk marking** - a checkbox on every queued lead (Instagram and
+  Store Outreach only - intentionally not on Visit Plan, since
+  multi-store visit trips don't suit a flat "select several, mark them
+  all" flow the same way individual messages do) lets you select several
+  at once. A selection bar appears with a "Copy IDs" button (copies a
+  comma-separated list like `5,9,12`) and the same "Mark as sent" link -
+  paste the whole list into the one input field and it marks every one of
+  them in a single run. Built specifically for working through a whole
+  session's worth of outreach and recording it all at once, rather than
+  one lead at a time. `action_id` is also in the CSV exports, for anyone
+  working from a spreadsheet instead of the dashboard.
 
 A **"Recent imports"** panel under the header shows the last 10 batches
 ingested - batch name, when, exactly how many leads were new versus

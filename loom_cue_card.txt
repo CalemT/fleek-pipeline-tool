@@ -1,0 +1,97 @@
+LOOM CUE CARD — keep on your phone, not on screen
+(glance at it between beats, don't read it word for word)
+
+Total target: 7–8 minutes. You're not typing anything - download
+loom_demo.sh alongside this, put it in your fleek-pipeline-tool folder,
+run `chmod +x loom_demo.sh` once, then `./loom_demo.sh` to start. It runs
+each real command for you and pauses - you just press Enter to move to
+the next step, while you narrate.
+
+═══════════════════════════════════════════
+BEAT 0 — INTRO (30 sec, just talk, script not started yet)
+═══════════════════════════════════════════
+"This is a daily outreach tool for Fleek's pipeline. It cleans the messy
+handover data, decides who gets today's 40 Instagram DMs, drafts the
+actual messages, and runs every morning on its own without ever messaging
+the same person twice. Let me show you live."
+
+Then run: ./loom_demo.sh
+
+═══════════════════════════════════════════
+BEAT 1 — FIRST INGEST + PLAN (script runs it for you)
+═══════════════════════════════════════════
+SAY (pointing at the output once it appears):
+"265 rows in, 250 new leads, 15 merged — those are duplicates the
+handover had listed under different IDs."
+
+The script will then tell you to open outreach_instagram_2026-06-25.csv.
+Open it. Find one row. Read the drafted message out loud. That's the
+proof moment — don't skip it. Then press Enter to continue.
+
+═══════════════════════════════════════════
+BEAT 2 — RUN IT AGAIN, SAME DAY (script runs it for you)
+═══════════════════════════════════════════
+SAY:
+"0 new, 40 already queued — running it again didn't draft anything
+twice."
+
+═══════════════════════════════════════════
+BEAT 3 — THE ACTUAL ASK: DROP IN DAY 2 (script runs it for you)
+═══════════════════════════════════════════
+SAY SLOWLY (this is the one sentence that matters most in the whole video):
+"28 new leads, 2 merged. Those 2 were already in the main list under a
+different ID, and it caught that automatically instead of messaging them
+again."
+
+The script ends here and tells you to switch to the browser.
+
+═══════════════════════════════════════════
+BEAT 4 — SHOW IT'S ACTUALLY LIVE (60 sec)
+═══════════════════════════════════════════
+Switch to browser tab: https://calemt.github.io/fleek-pipeline-tool/
+
+SAY:
+"This also runs every morning on its own, on GitHub's servers — no
+laptop needed. Here's today's real output."
+
+Click into ONE lead. Show the drafted message expanding.
+
+═══════════════════════════════════════════
+BEAT 5 — QUICK REPO TOUR (60–90 sec)
+═══════════════════════════════════════════
+Open the repo on github.com. Scroll the file list for 3 seconds.
+Open ARCHITECTURE.md — just show the diagram, don't read it.
+
+SAY:
+"GTM_STRATEGY.md has the full reasoning behind the scoring and how this
+scales. DEVELOPMENT_LOG.md is an honest log of every real bug I found
+while building this and how I fixed it — including production bugs I
+caught after it was already live."
+
+═══════════════════════════════════════════
+BEAT 6 — CLOSE (45 sec, just talk)
+═══════════════════════════════════════════
+"The caps and scoring weights right now are reasoned starting points,
+not proven ones — there's a command called recalibrate that checks
+honestly whether there's enough real outcome data yet to fit real
+weights, and refuses until there is. I'd rather show you that than
+pretend this is more finished than it actually is."
+
+═══════════════════════════════════════════
+IF SOMETHING BREAKS ON CAMERA
+═══════════════════════════════════════════
+Just say: "let's see what that says" and read the error out loud calmly.
+A real error you can explain looks better than a fake demo with nothing
+ever going wrong. You understand this tool — trust that.
+
+═══════════════════════════════════════════
+BEFORE YOU HIT RECORD
+═══════════════════════════════════════════
+- Camera off is completely fine - the brief asks for a screen walkthrough
+  with narration, not a personal presence requirement
+- Put loom_demo.sh in your fleek-pipeline-tool folder, run it once
+  (chmod +x loom_demo.sh) just to confirm it works on your machine
+- Close this chat / any other tabs that shouldn't be visible
+- Have this cue card open on your PHONE, not on the screen being recorded
+- Do one full silent dry run first, no recording, just to time yourself
+
